@@ -11,8 +11,6 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 public class Main {
 
-    public static MongoDatabase database;
-
     public static void main(String[] args) {
 
         Server server = new Server(8000);
