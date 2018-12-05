@@ -36,14 +36,14 @@ def cleanData(png, svg, idx):
         b = np.uint8(edge)
 
     im = Image.fromarray(b)
-    filename = "cleanData/" + str(idx) + ".png"
+    filename = "../data/cleaned_data/" + str(idx) + ".png"
     im.save(filename)
     return
 
 if __name__ == "__main__":
 
-    mr = 2
-    for idx in range(1, mr):
-        png = "originalData/" + str(idx) + ".png"
-        svg = "originalData/" + str(idx) + ".svg"
+    mr = 122
+    for idx in range(1, mr+1):
+        png = "../data/input_data/" + str(idx) + ".png"
+        svg = "../data/input_data/" + str(idx) + ".svg"
         cleanData(png, svg, idx)
