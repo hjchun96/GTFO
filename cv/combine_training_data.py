@@ -14,6 +14,9 @@ for (path_label, path_img) in zip(glob.glob("../data/cleaned_data/*.png"), glob.
     label = np.array(imageio.imread(path_label))
     img = np.array(imageio.imread(path_img))
 
+    if img.ndim==3:
+        img = rgb2grey(img)
+
     # Combine into a r, g, - picture
     combined = np.zeros(shape=label.shape)
     combined[:, :, 0] = rgb2grey(label)
