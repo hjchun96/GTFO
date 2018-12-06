@@ -4,14 +4,15 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
+  Text,
   Button,
+  TouchableOpacity,
+  FlatList,
+  ListItem,
+  AsyncStorage,
 } from 'react-native';
-import { WebBrowser } from 'expo';
-
-import { MonoText } from '../components/StyledText';
+import { getUserBuildings } from "../fetch/FetchWrapper";
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -20,7 +21,11 @@ export default class HomeScreen extends React.Component {
 
   render() {
     // TODO: fetch buildings and display here
-    buildings = []
+    // also get user email (from redux)
+    let buildings = getUserBuildings('test');
+    for (let i = 0; i < buildings.length; i++) {
+      buildings[i].key = buildings[i].name;
+    }
     return (
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -34,13 +39,22 @@ export default class HomeScreen extends React.Component {
               style={styles.welcomeImage}
             />
           </View>
+          <FlatList
+            data={buildings}
+            renderItem={({item}) =>
+              <TouchableOpacity
+                onPress={() => this._handleBuildingPressed()}
+                textStyle={{ color: "#bcbec1" }}>
+                <Text style={styles.item}>{item.key}</Text>
+              </TouchableOpacity>}
+          />
         </ScrollView>
-        {buildings}
         <Button
           buttonStyle={styles.addBuildingButton}
           title="Add a building"
           textStyle={{ color: "#bcbec1" }}
           onPress={() => this._handleAddBuildingButtonPressed()}
+          textStyle={{ color: "#bcbec1" }}
         />
       </View>
     );
@@ -50,6 +64,10 @@ export default class HomeScreen extends React.Component {
     this.props.navigation.navigate("AddBuilding");
   }
 
+  _handleBuildingPressed = () => {
+    this.props.navigation.navigate("Building");
+  }
+
 }
 
 const styles = StyleSheet.create({
@@ -57,15 +75,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
-  },
   contentContainer: {
     paddingTop: 30,
+    alignItems: 'center',
   },
   welcomeContainer: {
     alignItems: 'center',
@@ -79,26 +91,8 @@ const styles = StyleSheet.create({
     marginTop: 3,
     marginLeft: -10,
   },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
   homeScreenFilename: {
     marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center',
   },
   addBuildingButton: {
     position: 'absolute',
@@ -121,23 +115,18 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingBottom: 20,
   },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
+  sectionHeader: {
+    paddingTop: 2,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 2,
     fontSize: 14,
-    color: '#2e78b7',
+    fontWeight: 'bold',
+    backgroundColor: 'rgba(247,247,247,1.0)',
   },
+  item: {
+    padding: 10,
+    fontSize: 26,
+    height: 44,
+  }
 });

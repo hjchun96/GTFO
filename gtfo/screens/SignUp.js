@@ -57,7 +57,7 @@ export default class SignUpScreen extends React.Component {
     let password = this.state.password;
 
     createUser(this.state.email, this.state.password)
-      .then(response => AsyncStorage.setItem('userToken', 'abc'))
+      .then(response => AsyncStorage.setItem('userToken', this.state.email))
       .then(this.props.navigation.navigate('Main'));
 
     // checkUser(email, password)

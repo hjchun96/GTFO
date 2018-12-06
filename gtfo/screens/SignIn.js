@@ -56,7 +56,7 @@ export default class SignInScreen extends React.Component {
       return;
     }
     // TODO: check that the user is valid
-    await AsyncStorage.setItem('userToken', 'abc');
+    await AsyncStorage.setItem('userToken', this.state.email);
     this.props.navigation.navigate('Main');
   }
 
