@@ -18,6 +18,10 @@ export default class AddBuildingScreen extends React.Component {
     title: 'Add a building',
   };
 
+  state = {
+    name: '',
+  }
+
   render() {
     return (
       <View style={{ paddingVertical: 20 }}>
@@ -25,7 +29,7 @@ export default class AddBuildingScreen extends React.Component {
           <FormLabel>Building Name</FormLabel>
           <FormInput
             placeholder="Name..."
-            onChangeText={input => this.state.email = input}
+            onChangeText={input => this.state.name = input}
           />
           <Button
             buttonStyle={{ marginTop: 20 }}

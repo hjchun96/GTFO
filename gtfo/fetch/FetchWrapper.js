@@ -43,18 +43,22 @@ export function getUserBuildings(email) {
   return [{
     _id: "test1",
     name: "Towne",
-    image: []
+    image: [],
+    admins: [],
   }, {
     _id: "test2",
     name: "Moore",
-    image: []
+    image: [],
+    admins: [],
   }, {
     _id: "test2",
     name: "Levine",
-    image: []
+    image: [],
+    admins: [],
   }, {
     _id: "test3",
     name: "DRL",
-    image: []
+    image: [],
+    admins: [],
   }];
 }
