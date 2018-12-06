@@ -36,3 +36,25 @@ export function createUser(email, password) {
     })
   }).then(response => console.log(response));
 };
+
+export function getUserBuildings(email) {
+  let url = api + 'building/';
+  // TODO: get actual buildings for the user
+  return [{
+    _id: "test1",
+    name: "Towne",
+    image: []
+  }, {
+    _id: "test2",
+    name: "Moore",
+    image: []
+  }, {
+    _id: "test2",
+    name: "Levine",
+    image: []
+  }, {
+    _id: "test3",
+    name: "DRL",
+    image: []
+  }];
+}
