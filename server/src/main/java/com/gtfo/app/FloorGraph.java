@@ -10,8 +10,6 @@ public final class FloorGraph {
 
     private boolean[][] grid;
 
-    private static final int BLACK_THRESHOLD = 100;
-
     /**
      * Construct the floor-plan graph given processed image
      *
@@ -19,7 +17,7 @@ public final class FloorGraph {
      */
     public FloorGraph(String path) throws IOException {
         BufferedImage img = null;
-        img = ImageIO.read(new File("strawberry.jpg"));
+        img = ImageIO.read(new File(path));
 
         int width = img.getWidth();
         int height = img.getHeight();
@@ -27,7 +25,7 @@ public final class FloorGraph {
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                grid[i][j] = img.getRGB(i, j)  < BLACK_THRESHOLD;
+                grid[i][j] = img.getRGB(i, j)  != 0;
             }
         }
         this.grid = grid;
@@ -37,20 +35,8 @@ public final class FloorGraph {
         this.grid = grid;
     }
 
-    static List<Pixel> getPathFromParents(Pixel[][] parent, Pixel src, Pixel tgt) {
-        Pixel curr = tgt;
-        LinkedList<Pixel> out = new LinkedList<>();
 
-        while (!parent[curr.x][curr.y].equals(src)) {
-            out.offerFirst(curr);
-            curr = parent[curr.x][curr.y];
-        }
-
-        out.offerFirst(src);
-        return out;
-    }
-
-    public Set<Pixel> getNeighbors(Pixel p) {
+    Set<Pixel> getNeighbors(Pixel p) {
         int x = p.x;
         int y = p.y;
 
@@ -79,6 +65,20 @@ public final class FloorGraph {
         return out;
     }
 
+    // helper to trace path for getShortestPath
+    static List<Pixel> getPathFromParents(Pixel[][] parent, Pixel src, Pixel tgt) {
+        Pixel curr = tgt;
+        LinkedList<Pixel> out = new LinkedList<>();
+
+        while (!curr.equals(src)) {
+            out.offerFirst(curr);
+            curr = parent[curr.x][curr.y];
+        }
+
+        out.offerFirst(src);
+        return out;
+    }
+
     /**
      * Get the shortest path using BFS.
      * @param src
@@ -90,16 +90,17 @@ public final class FloorGraph {
         Pixel[][] parent = new Pixel[grid.length][grid[0].length];
         LinkedList<Pixel> queue = new LinkedList<>();
         queue.add(src);
+        visited[src.x][src.y] = true;
 
         while(!queue.isEmpty()) {
             Pixel curr = queue.poll();
-            visited[curr.x][curr.y] = true;
             if (curr.equals(tgt)) {
                 return getPathFromParents(parent, src, tgt);
             }
 
             for (Pixel n : getNeighbors(curr)) {
                 if (!visited[n.x][n.y]) {
+                    visited[n.x][n.y] = true;
                     parent[n.x][n.y] = curr;
                     queue.offer(n);
                 }
@@ -132,9 +133,9 @@ public final class FloorGraph {
     }
 
     public static void main(String[] args) {
-        boolean[][] grid = new boolean[][] {{true, true, true},
+        boolean[][] grid = new boolean[][] {{true, true, false},
                                             {true, true, true},
-                                            {true, true, true}};
+                                            {false, true, true}};
         FloorGraph g = new FloorGraph(grid);
         System.out.println(g.getShortestPath(new Pixel(0, 0), new Pixel(2, 2)));
     }
