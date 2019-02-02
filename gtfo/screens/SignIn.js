@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Image, AsyncStorage, StyleSheet, ScrollView } from "react-native";
 import { Card, Button, FormLabel, FormInput } from "react-native-elements";
+import { checkUser, createUser } from "../fetch/FetchWrapper";
 
 export default class SignInScreen extends React.Component {
   static navigationOptions = {
@@ -56,6 +57,10 @@ export default class SignInScreen extends React.Component {
       return;
     }
     // TODO: check that the user is valid
+    if (!checkUser(this.state.email, this.state.password)) {
+      alert("Invalid email or password.")
+    }
+
     await AsyncStorage.setItem('userToken', this.state.email);
     this.props.navigation.navigate('Main');
   }

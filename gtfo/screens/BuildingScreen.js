@@ -46,7 +46,7 @@ export default class BuildingScreen extends React.Component {
 
   _handleGetDirections = async () => {
     // directions handler gives perfect directions
-    this.setState({directions: "1) Go to the exit dummy.", viewDirections: true});
+    this.setState({directions: "1) Go to the exit.", viewDirections: true});
   }
 }
 
