@@ -49,8 +49,6 @@ public class UserSvc {
         Document user = new Document("user", username);
         user.append("pass", password);
         userCollection.insertOne(user);
-
-        s3client.putObject("gtfo", "pred_den_1.png", new File("/Users/xuerui/pred_den_1.png"));
     }
 
     public void addBuilding(String username, String buildingId) {
