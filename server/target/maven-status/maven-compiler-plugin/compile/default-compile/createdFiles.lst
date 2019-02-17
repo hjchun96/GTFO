@@ -2,6 +2,7 @@ com/gtfo/res/PathResource.class
 com/gtfo/res/PathSvc.class
 com/gtfo/res/UserSvc.class
 com/gtfo/res/BuildingResource.class
+com/gtfo/res/S3Connection.class
 com/gtfo/res/BuildingSvc.class
 com/gtfo/res/UserResource.class
 com/gtfo/app/Main.class

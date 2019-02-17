@@ -1,9 +1,12 @@
 package com.gtfo.res;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.Bucket;
 import com.mongodb.client.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -14,11 +17,16 @@ public class UserSvc {
     public MongoConnection mongoConnection;
     public MongoDatabase mongoDatabase;
     public MongoCollection<Document> userCollection;
+    public S3Connection s3connection;
+    public AmazonS3 s3client;
 
     public UserSvc() {
         mongoConnection = MongoConnection.getInstance();
         mongoDatabase = mongoConnection.getDatabase();
         userCollection = mongoDatabase.getCollection("users");
+
+        s3connection = new S3Connection();
+        s3client = s3connection.getInstance();
     }
 
     public String fetchUser(String user) {
@@ -41,6 +49,8 @@ public class UserSvc {
         Document user = new Document("user", username);
         user.append("pass", password);
         userCollection.insertOne(user);
+
+        s3client.putObject("gtfo", "pred_den_1.png", new File("/Users/xuerui/pred_den_1.png"));
     }
 
     public void addBuilding(String username, String buildingId) {

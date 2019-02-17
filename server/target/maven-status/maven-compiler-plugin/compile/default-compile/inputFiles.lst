@@ -3,5 +3,8 @@
 /Users/xuerui/Desktop/Penn/Senior_Fall/CIS400/GTFO/server/src/main/java/com/gtfo/res/UserResource.java
 /Users/xuerui/Desktop/Penn/Senior_Fall/CIS400/GTFO/server/src/main/java/com/gtfo/res/BuildingResource.java
 /Users/xuerui/Desktop/Penn/Senior_Fall/CIS400/GTFO/server/src/main/java/com/gtfo/res/MongoConnection.java
+/Users/xuerui/Desktop/Penn/Senior_Fall/CIS400/GTFO/server/src/main/java/com/gtfo/res/PathResource.java
 /Users/xuerui/Desktop/Penn/Senior_Fall/CIS400/GTFO/server/src/main/java/com/gtfo/app/Main.java
+/Users/xuerui/Desktop/Penn/Senior_Fall/CIS400/GTFO/server/src/main/java/com/gtfo/res/PathSvc.java
+/Users/xuerui/Desktop/Penn/Senior_Fall/CIS400/GTFO/server/src/main/java/com/gtfo/res/S3Connection.java
 /Users/xuerui/Desktop/Penn/Senior_Fall/CIS400/GTFO/server/src/main/java/com/gtfo/app/FloorGraph.java
