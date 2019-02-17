@@ -21,6 +21,17 @@ export function checkUser(email, password) {
     });
 };
 
+export function getUser(email, password) {
+  // TODO: we're throwing an exception on server rn if we pass a user
+  // that doesn't exist--fix this before calling checkUser
+  let url = api + 'user/' + email;
+  return fetch(url)
+    .then(response => response.json())
+    .then(responseJson => {
+      return responseJson && responseJson.pass == password;
+    });
+};
+
 // create a user with a given email and password
 export function createUser(email, password) {
   let url = api + 'user/';
