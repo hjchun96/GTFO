@@ -43,7 +43,7 @@ export default class HomeScreen extends React.Component {
             data={buildings}
             renderItem={({item}) =>
               <TouchableOpacity
-                onPress={() => this._handleBuildingPressed()}
+                onPress={() => this._handleBuildingPressed(item.key)}
                 textStyle={{ color: "#bcbec1" }}>
                 <Text style={styles.item}>{item.key}</Text>
               </TouchableOpacity>}
@@ -64,8 +64,9 @@ export default class HomeScreen extends React.Component {
     this.props.navigation.navigate("AddBuilding");
   }
 
-  _handleBuildingPressed = () => {
-    this.props.navigation.navigate("Building");
+  _handleBuildingPressed = (key) => {
+			 console.log(key);
+    this.props.navigation.navigate("Building", {building_name: key});
   }
 
 }

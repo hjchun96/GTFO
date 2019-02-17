@@ -12,10 +12,8 @@ import {
   FormLabel,
   FormInput
 } from "react-native-elements";
-import {getFloorplanFromName} from '../assets/asset_mapper.js'
-// import {imageExporter} from '../assets/image_exporter.js'
-import {loadImages} from '../assets/image_exporter.js'
-export default class BuildingScreen extends React.Component {
+
+export default class FloorPlansScreen extends React.Component {
 
   static navigationOptions = {
     title: 'Your building',
@@ -27,16 +25,10 @@ export default class BuildingScreen extends React.Component {
   }
 
   render() {
-				buildingName = this.props.navigation.state.params.building_name;
-				// image_name = getFloorplanFromName(this.props.navigation.state.params.building_name);
-				// asset_path = "../assets/images/";
-				// img_name = asset_path + image_name;
-				floorplanMap = loadImages();
-
     return (
       <View style={styles.container}>
         <Image
-          source = {floorplanMap[buildingName]}
+          source = {require('../assets/images/5.png')}
           style = {styles.floorPlan}
         />
         <Button

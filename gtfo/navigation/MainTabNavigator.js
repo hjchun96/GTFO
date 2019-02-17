@@ -8,6 +8,7 @@ import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AddBuildingScreen from '../screens/AddBuildingScreen';
 import BuildingScreen from '../screens/BuildingScreen';
+import FloorPlansScreen from '../screens/FloorPlansScreen';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
@@ -43,7 +44,22 @@ SettingsStack.navigationOptions = {
   ),
 };
 
+const FloorplanStack = createStackNavigator({
+  FloorPlans: FloorPlansScreen,
+});
+
+FloorplanStack.navigationOptions = {
+  tabBarLabel: 'Buildings',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
+    />
+  ),
+};
+
 export default createBottomTabNavigator({
   HomeStack,
   SettingsStack,
+		FloorplanStack
 });
