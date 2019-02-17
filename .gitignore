@@ -1,4 +1,5 @@
 .DS_Store
+server/keys
 server/.idea/*
 server/target/*
 server/keys

@@ -1,15 +1,13 @@
 package com.gtfo.res;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.json.JSONArray;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.InputStream;
 
 @Path("/building")
 public class BuildingResource {
@@ -21,17 +19,19 @@ public class BuildingResource {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBuilding(String body) throws JSONException {
+    public Response createBuilding(@FormDataParam("buildingName") String body, @FormDataParam("img") InputStream file)
+            throws JSONException {
         JSONObject json = new JSONObject(body);
         String name = json.getString("name").toLowerCase();
-        JSONArray plans_arr = json.getJSONArray("plans");
-        List<String> plans = new ArrayList<String>();
-        for (int i = 0; i < plans_arr.length(); i++) {
-            plans.add(plans_arr.getString(i));
-        }
-        buildingSvc.createBuilding(name, plans);
+//        JSONArray plans_arr = json.getJSONArray("plans");
+//        List<String> plans = new ArrayList<String>();
+//        for (int i = 0; i < plans_arr.length(); i++) {
+//            plans.add(plans_arr.getString(i));
+//        }
+//        buildingSvc.createBuilding(name, plans);
+        buildingSvc.createBuilding(name, file);
         return Response.ok().build();
     }
 
@@ -39,7 +39,10 @@ public class BuildingResource {
     @Path("{building}")
     public Response fetchBuilding(@PathParam("building") String building) {
         String response = buildingSvc.fetchBuilding(building);
-        return (response == null) ? Response.ok().build() : Response.ok().entity(response).build();
+        if (response == null) {
+            return Response.ok().build();
+        }
+        return Response.ok().entity(response).build();
     }
 
     @GET
