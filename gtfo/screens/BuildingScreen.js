@@ -4,6 +4,8 @@ import {
   Image,
   Text,
   StyleSheet,
+		ImageBackground,
+		TouchableWithoutFeedback,
   ScrollView
 } from "react-native";
 import {
@@ -27,38 +29,124 @@ export default class BuildingScreen extends React.Component {
     viewDirections: false,
     rendered_image: '',
     building_name: '',
+				startXCoord: -1,
+				startYCoord: -1,
+				endXCoord: -1,
+				endYCoord: -1,
+				routeStatus: "START",
   }
 
   render() {
+
+
+			const routeStatus = this.state.routeStatus;
+			let button, startMarker, endMarker;
+			if (routeStatus === "START") {
+				button = <Button
+						title="Choose Endpoint"
+						onPress={() => this._handleSetStart()}
+				/>
+			} else if (routeStatus === "END") {
+				button = <Button
+						title="Get directions"
+						onPress={() => this._handleSetEnd()}
+				/>
+			} else {
+				button = <Button
+						title="Start Over"
+						onPress={() => this._handleStartOver()}
+				/>
+			}
+
+			if (this.state.startXCoord != -1) {
+				startMarker = <View style = {this._getStartMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/flame.png')} /></View>;
+			}
+
+			if (this.state.startXCoord != -1) {
+				endMarker = <View style = {this._getEndMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/flame.png')} /></View>;
+			}
+
     this.state.building_name = this.navigationOptions;
 
     if (!this.state.viewDirections) {
       this.state.rendered_image = require('../assets/images/5.png');// TODO: CHANGE THIS TO BUILDING NAME
     }
     return (
-      <View style={styles.container}>
+					<TouchableWithoutFeedback onPress={(evt) => this._handlePress(evt) } >
+	      <View style={styles.container}>
 
-        <View style={styles.contentContainer}>
-          <Image
-            source = {this.state.rendered_image}
-            style = {styles.floorPlan}
-          />
-          <Text style={styles.directions}>
-            {this.state.directions}
-          </Text>
-        </View>
-        <Button
-          title="Get directions"
-          onPress={() => this._handleGetDirections()}
-        />
-      </View>
+	        <View style={styles.contentContainer}>
+	          <ImageBackground
+	            source = {this.state.rendered_image}
+	            style = {styles.floorPlan}
+	          >
+											{startMarker}
+											{endMarker}
+											</ImageBackground>
+	          <Text style={styles.directions}>
+	            {this.state.directions}
+	          </Text>
+	        </View>
+									{button}
+	      </View>
+						</TouchableWithoutFeedback>
     );
   }
 
-  _handleGetDirections = async () => {
-    // directions handler gives perfect directions
-    path_image = require('../assets/images/robot-dev.png');//getImageWithPath("40", "100", this.state.building_name);
-    this.setState({directions: "1) Go to the exit.", viewDirections: true, rendered_image:path_image});
+		_handleSetStart = async () => {
+			this.setState({routeStatus : "END"});
+  }
+
+		_handleSetEnd = async () => {
+
+
+			path_image = require('../assets/images/robot-dev.png');//getImageWithPath("40", "100", this.state.building_name);
+   this.setState({
+				routeStatus : "DIRECTIONS",
+				directions: "1) Go to the exit.",
+				viewDirections: true,
+				rendered_image:path_image});
+  }
+
+  _handleStartOver = async () => {
+				this.setState({
+					startXCoord: -1,
+					startYCoord: -1,
+					endXCoord: -1,
+					endYCoord: -1,
+					routeStatus: "START"
+				});
+  }
+
+		_handlePress = async (evt) => {
+
+			if (this.state.routeStatus == "START") {
+				this.setState({ startXCoord: evt.nativeEvent.locationX - 25,
+				 														 startYCoord: evt.nativeEvent.locationY - 25
+																	});
+			} else if (this.state.routeStatus == "END") {
+				this.setState({ endXCoord: evt.nativeEvent.locationX - 25,
+				 														 endYCoord: evt.nativeEvent.locationY - 25
+																	});
+			}
+			console.log("Registered click");
+
+  }
+
+		_getStartMarkerStyle = function() {
+				return {
+						left: this.state.startXCoord,
+						top: this.state.startYCoord,
+						alignItems: 'flex-start',
+	   }
+  }
+
+		_getEndMarkerStyle = function() {
+				return {
+						left: this.state.endXCoord,
+						top: this.state.endYCoord,
+						alignItems: 'flex-start',
+	   }
   }
 }
 
@@ -77,12 +165,24 @@ const styles = StyleSheet.create({
     width: 400,
     height: 400,
     resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
+    marginTop: -30,
+    marginLeft: 0,
     paddingBottom: 30,
   },
   directions: {
     fontSize: 30,
     color: "red",
+  },
+		overlayContainer: {
+			left: 50,
+			top: 10,
+			alignItems: 'flex-start',
+		},
+		overlay: {
+        opacity: 0.5,
+								width: 50,
+				    height: 50,
+								alignItems: 'flex-end',
+        backgroundColor: 'transparent'
   }
 });
