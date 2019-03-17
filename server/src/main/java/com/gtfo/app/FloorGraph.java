@@ -2,40 +2,38 @@ package com.gtfo.app;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 public final class FloorGraph {
 
-    private boolean[][] grid;
+    public boolean[][] grid;
 
     /**
-     * Construct the floor-plan graph given processed image
-     *
+     * Constructor 1 - floor-plan graph given image path.
      * @param path to image file
      */
     public FloorGraph(String path) throws IOException {
-        BufferedImage img = null;
-        img = ImageIO.read(new File(path));
-
-        int width = img.getWidth();
-        int height = img.getHeight();
-        boolean[][] grid = new boolean[width][height];
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                grid[i][j] = img.getRGB(i, j)  != 0;
-            }
-        }
-        this.grid = grid;
+        this(gridFromImg(ImageIO.read(new File(path))));
     }
 
+
+    /**
+     * Constructor 2 - floor-plan graph given java array
+     * @param grid .
+     */
     public FloorGraph(boolean[][] grid) {
         this.grid = grid;
     }
 
 
+    /**
+     * Finds which orthogonal neighbours are available to travel to (not black).
+     * @param p current pixel. Should not be a wall.
+     * @return .
+     */
     Set<Pixel> getNeighbors(Pixel p) {
         int x = p.x;
         int y = p.y;
@@ -45,7 +43,7 @@ public final class FloorGraph {
         }
 
         if (!grid[x][y]) {
-            throw new IllegalArgumentException("Pixel black");
+            throw new IllegalArgumentException("Pixel is a wall");
         }
 
         Set<Pixel> out = new HashSet<>();
@@ -59,20 +57,26 @@ public final class FloorGraph {
         if (y > 0 && grid[x][y-1]) {
             out.add(new Pixel(x, y-1));
         }
-        if (y < grid.length - 1 && grid[x][y+1]) {
+        if (y < grid[0].length - 1 && grid[x][y+1]) {
             out.add(new Pixel(x, y+1));
         }
         return out;
     }
 
-    // helper to trace path for getShortestPath
-    static List<Pixel> getPathFromParents(Pixel[][] parent, Pixel src, Pixel tgt) {
+    /**
+     * Helper - finds path from a pre-computed parent graph.
+     * @param parentGraph array of pointers to their parents
+     * @param src .
+     * @param tgt .
+     * @return Path as a List of Pixels, or NULL if unreachable.
+     */
+    static List<Pixel> getPathFromParentGraph(Pixel[][] parentGraph, Pixel src, Pixel tgt) {
         Pixel curr = tgt;
         LinkedList<Pixel> out = new LinkedList<>();
 
         while (!curr.equals(src)) {
             out.offerFirst(curr);
-            curr = parent[curr.x][curr.y];
+            curr = parentGraph[curr.x][curr.y];
         }
 
         out.offerFirst(src);
@@ -81,13 +85,13 @@ public final class FloorGraph {
 
     /**
      * Get the shortest path using BFS.
-     * @param src
-     * @param tgt
-     * @return path or null if none exists
+     * @param src .
+     * @param tgt .
+     * @return Path as a List of Pixels, or NULL if unreachable.
      */
     public List<Pixel> getShortestPath(Pixel src, Pixel tgt) {
         boolean[][] visited = new boolean[grid.length][grid[0].length];
-        Pixel[][] parent = new Pixel[grid.length][grid[0].length];
+        Pixel[][] parentGraph = new Pixel[grid.length][grid[0].length];
         LinkedList<Pixel> queue = new LinkedList<>();
         queue.add(src);
         visited[src.x][src.y] = true;
@@ -95,13 +99,13 @@ public final class FloorGraph {
         while(!queue.isEmpty()) {
             Pixel curr = queue.poll();
             if (curr.equals(tgt)) {
-                return getPathFromParents(parent, src, tgt);
+                return getPathFromParentGraph(parentGraph, src, tgt);
             }
 
             for (Pixel n : getNeighbors(curr)) {
                 if (!visited[n.x][n.y]) {
                     visited[n.x][n.y] = true;
-                    parent[n.x][n.y] = curr;
+                    parentGraph[n.x][n.y] = curr;
                     queue.offer(n);
                 }
             }
@@ -132,11 +136,120 @@ public final class FloorGraph {
         }
     }
 
+    /**
+     * Helper - converts BufferedImage to RGB int[][]
+     * @param image .
+     * @return .
+     */
+    private static int[][] toRGBArray(BufferedImage image) {
+
+        final byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        final int width = image.getWidth();
+        final int height = image.getHeight();
+        final int numComponents = image.getColorModel().getNumComponents();
+
+        int[][] result = new int[width][height];
+        if (numComponents == 4) { // ALPHA RGB
+            final int pixelLength = 4;
+            for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
+                int argb = 0;
+                argb += (((int) pixels[pixel] & 0xff) << 24); // alpha
+                argb += ((int) pixels[pixel + 1] & 0xff); // blue
+                argb += (((int) pixels[pixel + 2] & 0xff) << 8); // green
+                argb += (((int) pixels[pixel + 3] & 0xff) << 16); // red
+                result[col][row] = argb;
+                col++;
+                if (col == width) {
+                    col = 0;
+                    row++;
+                }
+            }
+        } else if (numComponents == 3) { // RGB
+            final int pixelLength = 3;
+            for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
+                int argb = 0;
+                argb += -16777216; // 255 alpha
+                argb += ((int) pixels[pixel] & 0xff); // blue
+                argb += (((int) pixels[pixel + 1] & 0xff) << 8); // green
+                argb += (((int) pixels[pixel + 2] & 0xff) << 16); // red
+                result[col][row] = argb;
+                col++;
+                if (col == width) {
+                    col = 0;
+                    row++;
+                }
+            }
+        } else if (numComponents == 1) { // BnW
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    result[x][y] = image.getRGB(x, y);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static boolean[][] gridFromImg(BufferedImage img) throws IOException {
+        int width = img.getWidth();
+        int height = img.getHeight();
+        boolean[][] grid = new boolean[width][height];
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                // Store whether a pixel is passable
+                int redness = ((img.getRGB(i, j) >> 16) & 0xFF); // Using redness as a proxy for BnW intensity
+                grid[i][j] = redness < 50; // TODO: what should this threshold be?
+            }
+        }
+        return grid;
+    }
+
+    /**
+     * Finds a path from src to tgt over the graph, and draws it over the floorPlan before returning it.
+     * @param floorPlan image of floorplan. Only used for eyeballing.
+     * @param graphImg the output of our neural network - connectivity.
+     * @param src .
+     * @param tgt .
+     * @return edited floorplan image
+     */
+    public static BufferedImage drawPath(BufferedImage floorPlan, BufferedImage graphImg, Pixel src, Pixel tgt) throws IOException {
+        FloorGraph g = new FloorGraph(gridFromImg(graphImg));
+
+        // Do BFS, then draw the path over in bright red
+        final int RED = -16777216 + (255 << 16);
+        Optional.ofNullable(g.getShortestPath(src, tgt))
+                .orElse(new LinkedList<>())
+                .forEach(p -> {
+                    final int LINE_THICKNESS = 5;
+                    for (int i = -LINE_THICKNESS + 1; i < LINE_THICKNESS; i++) {
+                        for (int j = -LINE_THICKNESS + 1; j < LINE_THICKNESS; j++) {
+                            floorPlan.setRGB(p.x + i, p.y + j, RED);
+                        }
+                    }
+                });
+        return floorPlan;
+    }
+
     public static void main(String[] args) {
-        boolean[][] grid = new boolean[][] {{true, true, false},
-                                            {true, true, true},
-                                            {false, true, true}};
-        FloorGraph g = new FloorGraph(grid);
-        System.out.println(g.getShortestPath(new Pixel(0, 0), new Pixel(2, 2)));
+        try {
+            // Load the image
+            String imagePath = "/Users/oliverchan/Desktop/floorplan.png";
+            String graphPath = "/Users/oliverchan/Desktop/graph.png";
+
+            // Compute the path image
+            BufferedImage img = ImageIO.read(new File(imagePath));
+            BufferedImage graphImg = ImageIO.read(new File(graphPath));
+            Pixel src = new Pixel(800, 1000);
+            Pixel tgt = new Pixel(3000, 1000);
+            BufferedImage drawnPath = drawPath(img, graphImg, src, tgt);
+
+            // Save the image as "path.png"
+            File outputfile = new File("/Users/oliverchan/Desktop/path.png");
+            ImageIO.write(drawnPath, "png", outputfile);
+
+        } catch (IOException ioe) {
+            System.out.println("Caught an IO Exception: " + ioe.getMessage());
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.gtfo.app;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.mongodb.client.MongoDatabase;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;

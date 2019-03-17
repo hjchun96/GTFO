@@ -1,1 +1,12 @@
 .DS_Store
+server/keys
+server/.idea/*
+server/target/*
+server/keys
+src/.idea/*
+src/target/*
+src/keys
+.idea/*
+server/.idea/*
+cv/.idea/*
+*.iml
