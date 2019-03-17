@@ -60,5 +60,4 @@ public class UserSvc {
         Bson update = push("admin", buildingId);
         userCollection.updateOne(eq("user", username), update);
     }
-
 }

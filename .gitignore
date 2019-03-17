@@ -7,5 +7,6 @@ src/.idea/*
 src/target/*
 src/keys
 .idea/*
+server/.idea/*
 cv/.idea/*
 *.iml

@@ -1,14 +1,18 @@
 package com.gtfo.res;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.gtfo.app.FloorGraph;
 import com.gtfo.app.Helpers;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -77,5 +81,28 @@ public class BuildingSvc {
         return StreamSupport.stream(buildingCollection.find(findQuery).limit(limit).spliterator(), false)
                 .map(Document::toJson)
                 .collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    /**
+     * Handles requests from users for paths in some building. Builds a response
+     * @param src "x,y"
+     * @param tgt "x,y"
+     * @param buildingId .
+     */
+    public BufferedImage getImageWithPath(String src, String tgt, String buildingId) throws IOException {
+        BufferedImage floorplan = null; // TODO: find the images from S3 using buildingId
+        BufferedImage graph = null; // TODO: find the images from S3 using buildingId
+
+        String[] srcCoords = src.split(",");
+        String[] tgtCoords = tgt.split(",");
+
+        if (srcCoords.length != 2 || tgtCoords.length != 2) {
+            throw new IllegalArgumentException("Badly formatted src or tgt strings: use 'x,y'");
+        }
+
+        FloorGraph.Pixel srcPixel = new FloorGraph.Pixel(Integer.parseInt(srcCoords[0]), Integer.parseInt(srcCoords[1]));
+        FloorGraph.Pixel tgtPixel = new FloorGraph.Pixel(Integer.parseInt(tgtCoords[0]), Integer.parseInt(tgtCoords[1]));
+
+        return FloorGraph.drawPath(floorplan, graph, srcPixel, tgtPixel);
     }
 }
