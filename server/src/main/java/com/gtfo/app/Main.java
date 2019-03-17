@@ -3,6 +3,8 @@ package com.gtfo.app;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -24,6 +26,9 @@ public class Main {
         serHol.setInitOrder(1);
         serHol.setInitParameter("jersey.config.server.provider.packages",
                 "com.gtfo.res");
+
+        final ResourceConfig resourceConfig = new ResourceConfig();
+        resourceConfig.register(MultiPartFeature.class);
 
         try {
             server.start();

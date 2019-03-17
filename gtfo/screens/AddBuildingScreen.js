@@ -1,5 +1,6 @@
 import React from "react";
-import { ImagePicker, Permissions } from 'expo';
+import { ImagePicker, Permissions, FileSystem } from 'expo';
+import base64 from 'base64-js'
 import {
   View,
   Image,
@@ -13,6 +14,8 @@ import {
   FormLabel,
   FormInput
 } from "react-native-elements";
+// import RNFS from 'react-native-fs';
+import { checkBuilding, createBuilding } from "../fetch/FetchWrapper";
 
 export default class AddBuildingScreen extends React.Component {
   static navigationOptions = {
@@ -33,14 +36,14 @@ export default class AddBuildingScreen extends React.Component {
             placeholder="Name..."
             onChangeText={input => this.state.name = input}
           />
-        <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          {this.state.photo && (
-            <Image
+          <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            {this.state.photo && (
+              <Image
                 source={{ uri: this.state.photo.uri }}
                 style={{ width: 150, height: 150 }}
-            />)
-          }
-        </Card>
+              />)
+            }
+          </Card>
           <Button
             buttonStyle={{ marginTop: 20, marginBottom: 20 }}
             backgroundColor="#03A9F4"
@@ -62,6 +65,8 @@ export default class AddBuildingScreen extends React.Component {
     const permission = await Permissions.getAsync(Permissions.CAMERA_ROLL);
     const options = {
       noData: true,
+      base64: true,
+      allowsEditing: false
     }
     let result = null;
     if (permission.status !== 'granted') {
@@ -78,24 +83,35 @@ export default class AddBuildingScreen extends React.Component {
   _addBuilding = async () => {
     if (!this.state.name || !this.state.photo) {
       alert("Please fill out all fields and choose a floorplan image.");
+      this.state.name = null;
+      this.state.photo = null;
       return;
     }
 
-    // TODO: this kicks off  wall extraction and sends image result to server
-    // 1) allow user to upload image
-    // 2) save to the device in a directory with building name (need to discuss this...
-    // alternatively could host on server file system -- definitely don't want it in a DB)
-    // because how would we get non-admin members to have access to floor plan images?
+    if (!checkBuilding(this.state.name)) {
+      alert("Building name already exists. Please pick a different name.");
+      this.state.name = null;
+      this.state.photo = null;
+      return;
+    }
 
-    // We should work on getting this stored in bulk storage like S3/server file system. My reasons:
-    // 1. complexity associated with storing on device and maintaining cross-platform compatibility--different file systems
-    // 2. complexity with getting images to non-admin members that didn't upload images
+    let user = await AsyncStorage.getItem('userToken');
+    // TODO: make user admin
+    createBuilding(this.state.name, this.state.photo.base64);
 
-    // 3) Call on the extract walls endpoint (how is that result sent to our server?)
-    // 4) add a building to this user
-
-    // for now i'm just gonna allow image uploads and pass it to the flask server
     this.props.navigation.navigate('Building');
   }
 
+}
+
+/**
+ * Helper to convert string to byte array
+ */
+function stringToUint8Array(str) {
+  const length = str.length;
+  const array = new Uint8Array(new ArrayBuffer(length));
+  for(let i = 0; i < length; i++) {
+    array[i] = str.charCodeAt(i);
+  }
+  return array;
 }

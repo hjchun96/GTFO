@@ -1,18 +1,26 @@
 package com.gtfo.res;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.gtfo.app.FloorGraph;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.gtfo.app.Helpers;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.apache.commons.codec.binary.Base64;
 import org.bson.Document;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -34,17 +42,23 @@ public class BuildingSvc {
         s3client = s3connection.getInstance();
     }
 
-    public void createBuilding(String name, List<String> plans) {
+    public void addFloorplan(String name, String img, String type) {
+        System.out.println("Here");
+        byte[] imageByteArray = Base64.decodeBase64(img);
+        String extension = "floorplans".equals(type) ? "jpg" : "png";
+        String imgName = type + "/" + name + "." + extension;
+        System.out.println(imgName);
+        try {
+            InputStream fileInputStream = new ByteArrayInputStream(imageByteArray);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType("image/" + extension);
+            metadata.setContentLength(imageByteArray.length);
+            s3client.putObject("gtfo", imgName, fileInputStream, metadata);
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getErrorMessage());
+        }
         Document building = new Document("name", name);
-        building.append("plans", name);
-        buildingCollection.insertOne(building);
-    }
-
-    public void createBuilding(String name, InputStream file) {
-        String key = "floorplans/" + name;
-        Helpers.store_in_s3(s3client, key, file);
-        Document building = new Document("name", name);
-        building.append("key", key);
+        building.append("s3_url", imgName);
         buildingCollection.insertOne(building);
     }
 
@@ -89,7 +103,7 @@ public class BuildingSvc {
      * @param tgt "x,y"
      * @param buildingId .
      */
-    public BufferedImage getImageWithPath(String src, String tgt, String buildingId) throws IOException {
+    public String getImageWithPath(String src, String tgt, String buildingId) throws IOException {
         BufferedImage floorplan = null; // TODO: find the images from S3 using buildingId
         BufferedImage graph = null; // TODO: find the images from S3 using buildingId
 
@@ -103,6 +117,12 @@ public class BuildingSvc {
         FloorGraph.Pixel srcPixel = new FloorGraph.Pixel(Integer.parseInt(srcCoords[0]), Integer.parseInt(srcCoords[1]));
         FloorGraph.Pixel tgtPixel = new FloorGraph.Pixel(Integer.parseInt(tgtCoords[0]), Integer.parseInt(tgtCoords[1]));
 
-        return FloorGraph.drawPath(floorplan, graph, srcPixel, tgtPixel);
+        // Get that image
+        BufferedImage drawnImg = FloorGraph.drawPath(floorplan, graph, srcPixel, tgtPixel);
+
+        // Convert with Base64 so BuildingResource can easily send it to client
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(drawnImg, "png", os);
+        return Base64.getEncoder().encodeToString(os.toByteArray());
     }
 }

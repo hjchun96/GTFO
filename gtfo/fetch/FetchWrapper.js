@@ -24,6 +24,15 @@ export function checkUser(email, password) {
     });
 };
 
+export function userExists(email) {
+  let url = api + 'user/' + email;
+  return fetch(url)
+    .then(response => response.json())
+    .then(responseJson => {
+      return responseJson.exists;
+    });
+};
+
 // create a user with a given email and password
 export function createUser(email, password) {
   let url = api + 'user/';
@@ -40,17 +49,31 @@ export function createUser(email, password) {
   }).then(response => console.log(response));
 };
 
-// creates a building with a given name and array of floor images
-export function createBuilding(buildingName) {
-  let url = api + 'building/';
+// check if a building with this name exists
+export function checkBuilding(buildingName) {
+  let url = api + 'building/' + buildingName;
+  return fetch(url)
+    .then(response => response.json())
+    .then(responseJson => {
+      return responseJson && responseJson.exists;
+    });
+};
+
+/**
+ * Creates a building with a given name and make user admin.
+ *
+ * Params: building name, base-64 representation of floorplan image
+ **/
+export function createBuilding(name, image) {
+  let url = api + 'building/addFloorplan/' + name;
   return fetch(url, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      name: buildingName,
+      img: image,
     })
   }).then(response => console.log(response));
 }

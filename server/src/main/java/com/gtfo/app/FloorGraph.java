@@ -221,7 +221,7 @@ public final class FloorGraph {
         Optional.ofNullable(g.getShortestPath(src, tgt))
                 .orElse(new LinkedList<>())
                 .forEach(p -> {
-                    final int LINE_THICKNESS = 5;
+                    final int LINE_THICKNESS = 10;
                     for (int i = -LINE_THICKNESS + 1; i < LINE_THICKNESS; i++) {
                         for (int j = -LINE_THICKNESS + 1; j < LINE_THICKNESS; j++) {
                             floorPlan.setRGB(p.x + i, p.y + j, RED);
