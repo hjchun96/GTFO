@@ -2,9 +2,10 @@ package com.gtfo.res;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.gtfo.app.FloorGraph;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.gtfo.app.Helpers;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -17,11 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -42,8 +39,60 @@ public class BuildingSvc {
         s3client = s3connection.getInstance();
     }
 
+    public byte[] getFloorplanImageFromS3(String name) {
+        String key = "floorplans/" + name + ".png";
+        S3Object obj = s3client.getObject("gtfo", key);
+        try {
+            FileOutputStream fos = new FileOutputStream(new File(key));
+            ObjectMetadata metadata = obj.getObjectMetadata();
+            S3ObjectInputStream s3is = obj.getObjectContent();
+
+            Long l = metadata.getContentLength();
+            int len = l.intValue();
+            byte[] res = new byte[len];
+            int read_len = 0;
+            while ((read_len = s3is.read(res)) > 0) {
+                fos.write(res, 0, read_len);
+            }
+            return res;
+        } catch (IOException e) {
+            System.out.println(e.getStackTrace());
+            return null;
+        }
+    }
+
+    public byte[] getNeuralNetImageFromS3(String name) {
+        String key = "neural_net/" + name + ".png";
+        S3Object obj = s3client.getObject("gtfo", key);
+        try {
+            FileOutputStream fos = new FileOutputStream(new File(key));
+            ObjectMetadata metadata = obj.getObjectMetadata();
+            S3ObjectInputStream s3is = obj.getObjectContent();
+
+            Long l = metadata.getContentLength();
+            int len = l.intValue();
+            byte[] res = new byte[len];
+            int read_len = 0;
+            while ((read_len = s3is.read(res)) > 0) {
+                fos.write(res, 0, read_len);
+            }
+            return res;
+        } catch (IOException e) {
+            System.out.println(e.getStackTrace());
+            return null;
+        }
+    }
+
+    private BufferedImage createImageFromBytes(byte[] imageData) {
+        ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
+        try {
+            return ImageIO.read(bais);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void addFloorplan(String name, String img, String type) {
-        System.out.println("Here");
         byte[] imageByteArray = Base64.decodeBase64(img);
         String extension = "floorplans".equals(type) ? "jpg" : "png";
         String imgName = type + "/" + name + "." + extension;
@@ -104,8 +153,8 @@ public class BuildingSvc {
      * @param buildingId .
      */
     public String getImageWithPath(String src, String tgt, String buildingId) throws IOException {
-        BufferedImage floorplan = null; // TODO: find the images from S3 using buildingId
-        BufferedImage graph = null; // TODO: find the images from S3 using buildingId
+        BufferedImage floorplan = createImageFromBytes(getFloorplanImageFromS3(buildingId));
+        BufferedImage graph = createImageFromBytes(getNeuralNetImageFromS3(buildingId));
 
         String[] srcCoords = src.split(",");
         String[] tgtCoords = tgt.split(",");
@@ -123,6 +172,6 @@ public class BuildingSvc {
         // Convert with Base64 so BuildingResource can easily send it to client
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(drawnImg, "png", os);
-        return Base64.getEncoder().encodeToString(os.toByteArray());
+        return Base64.encodeBase64String(os.toByteArray());
     }
 }
