@@ -16,7 +16,7 @@ import {
 } from "react-native-elements";
 
 import { getImageWithPath } from "../fetch/FetchWrapper";
-
+import picture from '../assets/images/5.png'
 export default class BuildingScreen extends React.Component {
   //
   static navigationOptions = ({ navigation }) => {
@@ -29,44 +29,44 @@ export default class BuildingScreen extends React.Component {
     viewDirections: false,
     rendered_image: '',
     building_name: '',
-				startXCoord: -1,
-				startYCoord: -1,
-				endXCoord: -1,
-				endYCoord: -1,
-				routeStatus: "START",
+		startXCoord: -1,
+		startYCoord: -1,
+		endXCoord: -1,
+		endYCoord: -1,
+		routeStatus: "START",
   }
 
   render() {
 
+		const routeStatus = this.state.routeStatus;
+		let button, startMarker, endMarker;
+		if (routeStatus === "START") {
+			button = <Button
+					title="Choose Endpoint"
+					onPress={() => this._handleSetStart()}
+			/>
+		} else if (routeStatus === "END") {
+			button = <Button
+					title="Get directions"
+					onPress={() => this._handleSetEnd()}
+			/>
+		} else {
+			button = <Button
+					title="Start Over"
+					onPress={() => this._handleStartOver()}
+			/>
+		}
 
-			const routeStatus = this.state.routeStatus;
-			let button, startMarker, endMarker;
-			if (routeStatus === "START") {
-				button = <Button
-						title="Choose Endpoint"
-						onPress={() => this._handleSetStart()}
-				/>
-			} else if (routeStatus === "END") {
-				button = <Button
-						title="Get directions"
-						onPress={() => this._handleSetEnd()}
-				/>
-			} else {
-				button = <Button
-						title="Start Over"
-						onPress={() => this._handleStartOver()}
-				/>
-			}
+		if (this.state.startXCoord != -1) {
+			startMarker = <View style = {this._getStartMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/flame.png')} /></View>;
+		}
 
-			if (this.state.startXCoord != -1) {
-				startMarker = <View style = {this._getStartMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/flame.png')} /></View>;
-			}
+		if (this.state.startXCoord != -1) {
+			endMarker = <View style = {this._getEndMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/flame.png')} /></View>;
+		}
 
-			if (this.state.startXCoord != -1) {
-				endMarker = <View style = {this._getEndMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/flame.png')} /></View>;
-			}
-
-    this.state.building_name = this.navigationOptions;
+    const {navigation} = this.props;
+    this.state.building_name = navigation.getParam('building_name', 'undefined');
 
     if (!this.state.viewDirections) {
       this.state.rendered_image = require('../assets/images/5.png');// TODO: CHANGE THIS TO BUILDING NAME
@@ -98,15 +98,27 @@ export default class BuildingScreen extends React.Component {
   }
 
 		_handleSetEnd = async () => {
+      const {width, height} = Image.resolveAssetSource(picture);
+      srcX = this.state.startXCoord * width/400.0;
+      srcY = this.state.startYCoord * height/400.0;
+      destX = this.state.endXCoord * width/400.0;
+      destY = this.state.endYCoord * height/400.0;
+      srcX_str = srcX.toString();
+      srcY_str = srcY.toString();
+      destX_str = destX.toString();
+      destY_str = destY.toString();
+      src = srcX_str.concat(",").concat(srcY_str);
+      dest = destX_str.concat(",").concat(destY_str);
+			path_image = getImageWithPath(src, dest, this.state.building_name);
 
-
-			path_image = require('../assets/images/robot-dev.png');//getImageWithPath("40", "100", this.state.building_name);
-   this.setState({
-				routeStatus : "DIRECTIONS",
-				directions: "1) Go to the exit.",
-				viewDirections: true,
-				rendered_image:path_image});
+     this.setState({
+  				routeStatus : "DIRECTIONS",
+  				directions: "1) Go to the exit.",
+  				viewDirections: true,
+  				rendered_image:path_image});
   }
+
+
 
   _handleStartOver = async () => {
 				this.setState({

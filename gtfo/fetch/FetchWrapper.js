@@ -2,6 +2,8 @@ import {
   Constants
 } from "expo";
 
+import { Buffer } from 'buffer';
+
 const manifest = Constants.manifest;
 
 const server = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts.dev ?
@@ -53,8 +55,26 @@ export function createBuilding(buildingName) {
   }).then(response => console.log(response));
 }
 
-// TODO: add building to user
+export function getImageWithPath(src, dest, building) {
+  console.log(src)
+  console.log(dest)
+  console.log(building)
+  let url = api + 'path/';
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      src: src,
+      dest: dest,
+      building_path: building,
+    })
+  }).then(response => console.log("HPEL"));
+};
 
+// TODO: add building to user
 export function getUserBuildings(email) {
   let url = api + 'building/';
   // TODO: get actual buildings for the user

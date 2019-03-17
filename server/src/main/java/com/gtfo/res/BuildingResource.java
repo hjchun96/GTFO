@@ -57,4 +57,11 @@ public class BuildingResource {
         String response = buildingSvc.fetchBuildingOnPrefix(limit, prefix);
         return (response == null) ? Response.ok().build() : Response.ok().entity(response).build();
     }
+
+    @POST
+    @Path("{building}")
+    public Response getImageWithPath(@PathParam("building") String src, String dst, String building) {
+        String response = buildingSvc.getImageWithPath(src, dest, building);
+        return (response == null) ?  Response.ok().build() :  Response.ok().entity(response).build();
+    }
 }
