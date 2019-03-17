@@ -96,18 +96,8 @@ export default class AddBuildingScreen extends React.Component {
     }
 
     let user = await AsyncStorage.getItem('userToken');
-    createBuilding(user, this.state.photo.base64);
-
-
-    // TODO: this kicks off  wall extraction and sends image result to server
-    // 1) allow user to upload image
-    // 2) check that building doesn't already exist
-    /* the rest of this can be done async */
-    // 3) save to S3 (returns URL)
-    // 4) Call on the extract walls endpoint with building name/URL to original image (which also creates an entry on S3)
-    // 5) Create building
-    // 6) Add building to this user as admin (username, buildingID)
-    // 7) Add a building to this user (after S3 sends back URL)
+    // TODO: make user admin
+    createBuilding(this.state.name, this.state.photo.base64);
 
     this.props.navigation.navigate('Building');
   }

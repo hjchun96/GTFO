@@ -22,14 +22,16 @@ public class BuildingResource {
     }
 
     @POST
-    @Path("{floorplanName}")
+    @Path("/addFloorplan/{floorplanName}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createBuilding(String body, @PathParam("floorplanName") String floorplanName)
             throws JSONException {
         JSONObject json = new JSONObject(body);
         String img = json.getString("img");
-        buildingSvc.createBuilding(floorplanName, img);
+        buildingSvc.addFloorplan(floorplanName, img, "floorplans");
+
+        // ADD FLASK SERVER CALL
         return Response.ok().build();
     }
 

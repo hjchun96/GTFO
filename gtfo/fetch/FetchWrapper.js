@@ -63,9 +63,7 @@ export function checkBuilding(buildingName) {
  * Params: building name, base-64 representation of floorplan image
  **/
 export function createBuilding(name, image) {
-  let url = api + 'building/' + name;
-
-  console.log("here");
+  let url = api + 'building/addFloorplan/' + name;
   return fetch(url, {
     method: 'POST',
     headers: {
