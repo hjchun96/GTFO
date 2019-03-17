@@ -8,11 +8,13 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -89,7 +91,7 @@ public class BuildingSvc {
      * @param tgt "x,y"
      * @param buildingId .
      */
-    public BufferedImage getImageWithPath(String src, String tgt, String buildingId) throws IOException {
+    public String getImageWithPath(String src, String tgt, String buildingId) throws IOException {
         BufferedImage floorplan = null; // TODO: find the images from S3 using buildingId
         BufferedImage graph = null; // TODO: find the images from S3 using buildingId
 
@@ -103,6 +105,12 @@ public class BuildingSvc {
         FloorGraph.Pixel srcPixel = new FloorGraph.Pixel(Integer.parseInt(srcCoords[0]), Integer.parseInt(srcCoords[1]));
         FloorGraph.Pixel tgtPixel = new FloorGraph.Pixel(Integer.parseInt(tgtCoords[0]), Integer.parseInt(tgtCoords[1]));
 
-        return FloorGraph.drawPath(floorplan, graph, srcPixel, tgtPixel);
+        // Get that image
+        BufferedImage drawnImg = FloorGraph.drawPath(floorplan, graph, srcPixel, tgtPixel);
+
+        // Convert with Base64 so BuildingResource can easily send it to client
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(drawnImg, "png", os);
+        return Base64.getEncoder().encodeToString(os.toByteArray());
     }
 }
