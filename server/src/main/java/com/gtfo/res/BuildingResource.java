@@ -22,11 +22,12 @@ public class BuildingResource {
     }
 
     @POST
-    @Path("{floorplanName}")
+    @Path("/{floorplanName}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createBuilding(String body, @PathParam("floorplanName") String floorplanName)
             throws JSONException {
+        System.out.println("Building: " + floorplanName);
         JSONObject json = new JSONObject(body);
         String img = json.getString("img");
         buildingSvc.createBuilding(floorplanName, img);
