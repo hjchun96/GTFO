@@ -1,11 +1,14 @@
 package com.gtfo.res;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.gtfo.app.FloorGraph;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.gtfo.app.Helpers;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.apache.commons.codec.binary.Base64;
 import org.bson.Document;
 
 import javax.imageio.ImageIO;
@@ -13,6 +16,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -36,17 +42,23 @@ public class BuildingSvc {
         s3client = s3connection.getInstance();
     }
 
-    public void createBuilding(String name, List<String> plans) {
+    public void addFloorplan(String name, String img, String type) {
+        System.out.println("Here");
+        byte[] imageByteArray = Base64.decodeBase64(img);
+        String extension = "floorplans".equals(type) ? "jpg" : "png";
+        String imgName = type + "/" + name + "." + extension;
+        System.out.println(imgName);
+        try {
+            InputStream fileInputStream = new ByteArrayInputStream(imageByteArray);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType("image/" + extension);
+            metadata.setContentLength(imageByteArray.length);
+            s3client.putObject("gtfo", imgName, fileInputStream, metadata);
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getErrorMessage());
+        }
         Document building = new Document("name", name);
-        building.append("plans", name);
-        buildingCollection.insertOne(building);
-    }
-
-    public void createBuilding(String name, InputStream file) {
-        String key = "floorplans/" + name;
-        Helpers.store_in_s3(s3client, key, file);
-        Document building = new Document("name", name);
-        building.append("key", key);
+        building.append("s3_url", imgName);
         buildingCollection.insertOne(building);
     }
 
