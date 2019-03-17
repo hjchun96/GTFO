@@ -48,8 +48,14 @@ export default class SignUpScreen extends React.Component {
       alert("Please fill out all fields.");
       return;
     }
+
     if (this.state.password != this.state.confirmedPassword) {
       alert("Passwords do not match.");
+      return;
+    }
+
+    if (checkUser(this.state.email, this.state.password)) {
+      alert("An account with this email address already exists. Please try again.");
       return;
     }
 
@@ -59,15 +65,5 @@ export default class SignUpScreen extends React.Component {
     createUser(this.state.email, this.state.password)
       .then(response => AsyncStorage.setItem('userToken', this.state.email))
       .then(this.props.navigation.navigate('Main'));
-
-    // checkUser(email, password)
-    //   .then(response => {
-    //     if (response) {
-    //       alert("An account with this email address already exists. Please try again.");
-    //     } else {
-    //       alert("success");
-    //     }
-    //   })
-    // // TODO: check if email exists (need fix on server for this)
   }
 }
