@@ -59,10 +59,10 @@ public class BuildingResource {
         return (response == null) ? Response.ok().build() : Response.ok().entity(response).build();
     }
 
-    @POST
-    @Path("{building}")
-    public Response getImageWithPath(@PathParam("building") String src, String dst, String building) {
-        String response = buildingSvc.getImageWithPath(src, dest, building);
+    @GET
+    @Path("/imagePath/{building}/{src}/{dst}")
+    public Response getImageWithPath( @PathParam("building") String building, @PathParam("src") String src, @PathParam("dst") String dst) {
+        String response = buildingSvc.getImageWithPath(src, dst, building);
         return (response == null) ?  Response.ok().build() :  Response.ok().entity(response).build();
     }
 }

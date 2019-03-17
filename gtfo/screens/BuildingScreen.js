@@ -110,15 +110,15 @@ export default class BuildingScreen extends React.Component {
       src = srcX_str.concat(",").concat(srcY_str);
       dest = destX_str.concat(",").concat(destY_str);
 			path_image = getImageWithPath(src, dest, this.state.building_name);
-
-     this.setState({
-  				routeStatus : "DIRECTIONS",
-  				directions: "1) Go to the exit.",
-  				viewDirections: true,
-  				rendered_image:path_image});
+      console.log("path image: " + path_image);
+      console.log(path_image);
+      this.setState({
+  				// routeStatus : "DIRECTIONS",
+  				// directions: "1) Go to the exit.",
+  				// viewDirections: true,
+  				// rendered_image:path_image}
+        });
   }
-
-
 
   _handleStartOver = async () => {
 				this.setState({

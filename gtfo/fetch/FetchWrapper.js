@@ -78,23 +78,19 @@ export function createBuilding(name, image) {
   }).then(response => console.log(response));
 }
 
-export function getImageWithPath(src, dest, building) {
+export function getImageWithPath(src, dst, building) {
   console.log(src)
-  console.log(dest)
+  console.log(dst)
   console.log(building)
-  let url = api + 'path/';
+  let url = api + 'imagePath/' + building + '/' + src + '/' + dst;
+  console.log("url: " + url);
   return fetch(url, {
-    method: 'POST',
+    method: 'GET',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      src: src,
-      dest: dest,
-      building_path: building,
-    })
-  }).then(response => console.log("HPEL"));
+  }).then(response => {return '../assets/images/robot-dev.png'});
 };
 
 // TODO: add building to user

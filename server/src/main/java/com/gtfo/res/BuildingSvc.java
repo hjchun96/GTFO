@@ -163,8 +163,8 @@ public class BuildingSvc {
             throw new IllegalArgumentException("Badly formatted src or tgt strings: use 'x,y'");
         }
 
-        FloorGraph.Pixel srcPixel = new FloorGraph.Pixel(Integer.parseInt(srcCoords[0]), Integer.parseInt(srcCoords[1]));
-        FloorGraph.Pixel tgtPixel = new FloorGraph.Pixel(Integer.parseInt(tgtCoords[0]), Integer.parseInt(tgtCoords[1]));
+        FloorGraph.Pixel srcPixel = new FloorGraph.Pixel((int) Double.parseDouble(srcCoords[0]), (int) Double.parseDouble(srcCoords[1]));
+        FloorGraph.Pixel tgtPixel = new FloorGraph.Pixel((int) Double.parseDouble(tgtCoords[0]), (int) Double.parseDouble(tgtCoords[1]));
 
         // Get that image
         BufferedImage drawnImg = FloorGraph.drawPath(floorplan, graph, srcPixel, tgtPixel);
