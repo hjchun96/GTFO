@@ -1,13 +1,16 @@
 package com.gtfo.res;
 
-import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.GET;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.InputStream;
 
 @Path("/building")
 public class BuildingResource {
@@ -19,19 +22,14 @@ public class BuildingResource {
     }
 
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Path("{floorplanName}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBuilding(@FormDataParam("buildingName") String body, @FormDataParam("img") InputStream file)
+    public Response createBuilding(String body, @PathParam("floorplanName") String floorplanName)
             throws JSONException {
         JSONObject json = new JSONObject(body);
-        String name = json.getString("name").toLowerCase();
-//        JSONArray plans_arr = json.getJSONArray("plans");
-//        List<String> plans = new ArrayList<String>();
-//        for (int i = 0; i < plans_arr.length(); i++) {
-//            plans.add(plans_arr.getString(i));
-//        }
-//        buildingSvc.createBuilding(name, plans);
-        buildingSvc.createBuilding(name, file);
+        String img = json.getString("img");
+        buildingSvc.createBuilding(floorplanName, img);
         return Response.ok().build();
     }
 

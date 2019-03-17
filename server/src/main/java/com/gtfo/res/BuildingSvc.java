@@ -1,5 +1,6 @@
 package com.gtfo.res;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.gtfo.app.Helpers;
 import com.mongodb.client.FindIterable;
@@ -7,6 +8,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +32,15 @@ public class BuildingSvc {
         s3client = s3connection.getInstance();
     }
 
-    public void createBuilding(String name, List<String> plans) {
-        Document building = new Document("name", name);
-        building.append("plans", name);
-        buildingCollection.insertOne(building);
-    }
-
-    public void createBuilding(String name, InputStream file) {
+    public void createBuilding(String name, String img) {
         String key = "floorplans/" + name;
-        Helpers.store_in_s3(s3client, key, file);
+        try {
+            s3client.putObject("gtfo", name, new File(img));
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getErrorMessage());
+        }
         Document building = new Document("name", name);
-        building.append("key", key);
+        building.append("s3_url", key);
         buildingCollection.insertOne(building);
     }
 
