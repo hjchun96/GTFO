@@ -11,6 +11,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 
 @Path("/building")
 public class BuildingResource {
@@ -61,7 +62,8 @@ public class BuildingResource {
 
     @GET
     @Path("/imagePath/{building}/{src}/{dst}")
-    public Response getImageWithPath( @PathParam("building") String building, @PathParam("src") String src, @PathParam("dst") String dst) {
+    public Response getImageWithPath( @PathParam("building") String building, @PathParam("src") String src,
+                                      @PathParam("dst") String dst) throws IOException {
         String response = buildingSvc.getImageWithPath(src, dst, building);
         return (response == null) ?  Response.ok().build() :  Response.ok().entity(response).build();
     }
