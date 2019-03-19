@@ -62,8 +62,10 @@ public class BuildingResource {
 
     @GET
     @Path("/imagePath/{building}/{src}/{dst}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getImageWithPath( @PathParam("building") String building, @PathParam("src") String src,
-                                      @PathParam("dst") String dst) throws IOException {
+                                      @PathParam("dst") String dst) throws IOException, JSONException {
+        System.out.println("src: " + src + " dst: " + dst);
         String response = buildingSvc.getImageWithPath(src, dst, building);
         return (response == null) ?  Response.ok().build() :  Response.ok().entity(response).build();
     }

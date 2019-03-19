@@ -6,6 +6,7 @@ import {
   StyleSheet,
 		ImageBackground,
 		TouchableWithoutFeedback,
+  Alert,
   ScrollView
 } from "react-native";
 import {
@@ -27,7 +28,7 @@ export default class BuildingScreen extends React.Component {
   state = {
     directions: '',
     viewDirections: false,
-    rendered_image: '',
+    rendered_image: require('../assets/images/5.png'),
     building_name: '',
 		startXCoord: -1,
 		startYCoord: -1,
@@ -65,13 +66,9 @@ export default class BuildingScreen extends React.Component {
 			endMarker = <View style = {this._getEndMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/flame.png')} /></View>;
 		}
 
-    const {navigation} = this.props;
-    this.state.building_name = navigation.getParam('building_name', 'undefined');
-
-    if (!this.state.viewDirections) {
-      this.state.rendered_image = require('../assets/images/5.png');// TODO: CHANGE THIS TO BUILDING NAME
-    }
-    return (
+	    const {navigation} = this.props;
+	    this.state.building_name = navigation.getParam('building_name', 'undefined');
+	    return (
 					<TouchableWithoutFeedback onPress={(evt) => this._handlePress(evt) } >
 	      <View style={styles.container}>
 
@@ -90,34 +87,64 @@ export default class BuildingScreen extends React.Component {
 									{button}
 	      </View>
 						</TouchableWithoutFeedback>
-    );
-  }
+    	);
+	  }
 
-		_handleSetStart = async () => {
-			this.setState({routeStatus : "END"});
-  }
+	_handleSetStart = async () => {
+		this.setState({routeStatus : "END"});
+	}
 
 		_handleSetEnd = async () => {
       const {width, height} = Image.resolveAssetSource(picture);
-      srcX = this.state.startXCoord * width/400.0;
-      srcY = this.state.startYCoord * height/400.0;
-      destX = this.state.endXCoord * width/400.0;
-      destY = this.state.endYCoord * height/400.0;
+      console.log("width: " + width);
+      console.log("height: " + height);
+
+      newSrcX = this.state.startXCoord + 50;
+      newSrcY = this.state.startYCoord + 25;
+      newTgtX = this.state.endXCoord;
+      newTgtY = this.state.endYCoord + 75;
+
+      console.log("new srcX: " + newSrcX);
+      console.log("new srcY: " + newSrcY);
+      console.log("new destX: " + newTgtX);
+      console.log("new destY: " + newTgtY);
+
+
+      srcX = newSrcX * width/400.0;
+      srcY = newSrcY * height/400.0;
+      destX = newTgtX * width/400.0;
+      destY = newTgtY * height/400.0;
+      console.log("srcX: " + srcX);
+      console.log("srcY: " + srcY);
+      console.log("destX: " + destX);
+      console.log("destY: " + destY);
       srcX_str = srcX.toString();
       srcY_str = srcY.toString();
       destX_str = destX.toString();
       destY_str = destY.toString();
       src = srcX_str.concat(",").concat(srcY_str);
       dest = destX_str.concat(",").concat(destY_str);
-			path_image = getImageWithPath(src, dest, this.state.building_name);
-      console.log("path image: " + path_image);
-      console.log(path_image);
-      this.setState({
-  				// routeStatus : "DIRECTIONS",
-  				// directions: "1) Go to the exit.",
-  				// viewDirections: true,
-  				// rendered_image:path_image}
+	  path_image = getImageWithPath(src, dest, this.state.building_name);
+	  path_image.then(response => {
+	  	return response.json();
+  	  }).then(json => {
+  	  	console.log(json.err);
+  	  	if(json.err) {
+  	  		Alert.alert("Invalid Start / End location selected", json.err[0]);
+  	  		this._handleStartOver();
+        	return;
+  	  	}
+
+  	  	var image_string = 'data:image/png;base64,'+json.img[0];
+
+  	  	this.setState({
+  				routeStatus : "DIRECTIONS",
+  				directions: "1) Go to the exit.",
+  				viewDirections: true,
+  				rendered_image: {uri : image_string}
         });
+  	  });
+      
   }
 
   _handleStartOver = async () => {
@@ -126,7 +153,8 @@ export default class BuildingScreen extends React.Component {
 					startYCoord: -1,
 					endXCoord: -1,
 					endYCoord: -1,
-					routeStatus: "START"
+					routeStatus: "START",
+					rendered_image: require('../assets/images/5.png')
 				});
   }
 
@@ -137,8 +165,8 @@ export default class BuildingScreen extends React.Component {
 				 														 startYCoord: evt.nativeEvent.locationY - 25
 																	});
 			} else if (this.state.routeStatus == "END") {
-				this.setState({ endXCoord: evt.nativeEvent.locationX - 25,
-				 														 endYCoord: evt.nativeEvent.locationY - 25
+				this.setState({ endXCoord: evt.nativeEvent.locationX - 50,
+				 														 endYCoord: evt.nativeEvent.locationY -75
 																	});
 			}
 			console.log("Registered click");

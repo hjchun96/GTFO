@@ -4,6 +4,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.util.IOUtils;
 import com.gtfo.app.FloorGraph;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.mongodb.client.FindIterable;
@@ -11,6 +12,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.codec.binary.Base64;
 import org.bson.Document;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -39,48 +42,18 @@ public class BuildingSvc {
         s3client = s3connection.getInstance();
     }
 
-    public byte[] getFloorplanImageFromS3(String name) {
+    public byte[] getFloorplanImageFromS3(String name) throws IOException {
         String key = "floorplans/" + name + ".png";
         S3Object obj = s3client.getObject("gtfo", key);
-        try {
-            FileOutputStream fos = new FileOutputStream(new File(key));
-            ObjectMetadata metadata = obj.getObjectMetadata();
-            S3ObjectInputStream s3is = obj.getObjectContent();
-
-            Long l = metadata.getContentLength();
-            int len = l.intValue();
-            byte[] res = new byte[len];
-            int read_len = 0;
-            while ((read_len = s3is.read(res)) > 0) {
-                fos.write(res, 0, read_len);
-            }
-            return res;
-        } catch (IOException e) {
-            System.out.println(e.getStackTrace());
-            return null;
-        }
+        byte[] res = IOUtils.toByteArray(obj.getObjectContent());
+        return res;
     }
 
-    public byte[] getNeuralNetImageFromS3(String name) {
+    public byte[] getNeuralNetImageFromS3(String name) throws IOException {
         String key = "neural_net/" + name + ".png";
         S3Object obj = s3client.getObject("gtfo", key);
-        try {
-            FileOutputStream fos = new FileOutputStream(new File(key));
-            ObjectMetadata metadata = obj.getObjectMetadata();
-            S3ObjectInputStream s3is = obj.getObjectContent();
-
-            Long l = metadata.getContentLength();
-            int len = l.intValue();
-            byte[] res = new byte[len];
-            int read_len = 0;
-            while ((read_len = s3is.read(res)) > 0) {
-                fos.write(res, 0, read_len);
-            }
-            return res;
-        } catch (IOException e) {
-            System.out.println(e.getStackTrace());
-            return null;
-        }
+        byte[] res = IOUtils.toByteArray(obj.getObjectContent());
+        return res;
     }
 
     private BufferedImage createImageFromBytes(byte[] imageData) {
@@ -94,7 +67,7 @@ public class BuildingSvc {
 
     public void addFloorplan(String name, String img, String type) {
         byte[] imageByteArray = Base64.decodeBase64(img);
-        String extension = "floorplans".equals(type) ? "jpg" : "png";
+        String extension = "png";
         String imgName = type + "/" + name + "." + extension;
         System.out.println(imgName);
         try {
@@ -107,7 +80,7 @@ public class BuildingSvc {
             System.err.println(e.getErrorMessage());
         }
         Document building = new Document("name", name);
-        building.append("s3_url", imgName);
+        building.append("s3_url", name);
         buildingCollection.insertOne(building);
     }
 
@@ -152,7 +125,7 @@ public class BuildingSvc {
      * @param tgt "x,y"
      * @param buildingId .
      */
-    public String getImageWithPath(String src, String tgt, String buildingId) throws IOException {
+    public String getImageWithPath(String src, String tgt, String buildingId) throws IOException, JSONException {
         BufferedImage floorplan = createImageFromBytes(getFloorplanImageFromS3(buildingId));
         BufferedImage graph = createImageFromBytes(getNeuralNetImageFromS3(buildingId));
 
@@ -166,12 +139,22 @@ public class BuildingSvc {
         FloorGraph.Pixel srcPixel = new FloorGraph.Pixel((int) Double.parseDouble(srcCoords[0]), (int) Double.parseDouble(srcCoords[1]));
         FloorGraph.Pixel tgtPixel = new FloorGraph.Pixel((int) Double.parseDouble(tgtCoords[0]), (int) Double.parseDouble(tgtCoords[1]));
 
-        // Get that image
-        BufferedImage drawnImg = FloorGraph.drawPath(floorplan, graph, srcPixel, tgtPixel);
+        try {
+            // Get that image
+            BufferedImage drawnImg = FloorGraph.drawPath(floorplan, graph, srcPixel, tgtPixel);
+            // Convert with Base64 so BuildingResource can easily send it to client
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(drawnImg, "png", os);
+            JSONObject res = new JSONObject();
+            res.append("img", Base64.encodeBase64String(os.toByteArray()));
+            return res.toString();
 
-        // Convert with Base64 so BuildingResource can easily send it to client
-        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(drawnImg, "png", os);
-        return Base64.encodeBase64String(os.toByteArray());
+        } catch(IllegalArgumentException e) {
+            JSONObject res = new JSONObject();
+            res.append("err", e.getMessage());
+            return res.toString();
+        }
+
+
     }
 }

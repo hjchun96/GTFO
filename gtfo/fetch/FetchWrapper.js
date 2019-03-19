@@ -79,10 +79,7 @@ export function createBuilding(name, image) {
 }
 
 export function getImageWithPath(src, dst, building) {
-  console.log(src)
-  console.log(dst)
-  console.log(building)
-  let url = api + 'imagePath/' + building + '/' + src + '/' + dst;
+  let url = api + 'building/imagePath/' + building + '/' + src + '/' + dst;
   console.log("url: " + url);
   return fetch(url, {
     method: 'GET',
@@ -90,7 +87,7 @@ export function getImageWithPath(src, dst, building) {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-  }).then(response => {return '../assets/images/robot-dev.png'});
+  });
 };
 
 // TODO: add building to user
@@ -98,24 +95,30 @@ export function getUserBuildings(email) {
   let url = api + 'building/';
   // TODO: get actual buildings for the user
   return [{
-    _id: "test1",
-    name: "Towne",
-    image: [],
-    admins: [],
-  }, {
-    _id: "test2",
-    name: "Moore",
-    image: [],
-    admins: [],
-  }, {
-    _id: "test2",
-    name: "Levine",
-    image: [],
-    admins: [],
-  }, {
-    _id: "test3",
-    name: "DRL",
-    image: [],
-    admins: [],
+      _id: "test",
+      name: "test",
+      image: [],
+      admins: [],
   }];
+  // return [{
+  //   _id: "test1",
+  //   name: "Towne",
+  //   image: [],
+  //   admins: [],
+  // }, {
+  //   _id: "test2",
+  //   name: "Moore",
+  //   image: [],
+  //   admins: [],
+  // }, {
+  //   _id: "test2",
+  //   name: "Levine",
+  //   image: [],
+  //   admins: [],
+  // }, {
+  //   _id: "test3",
+  //   name: "DRL",
+  //   image: [],
+  //   admins: [],
+  // }];
 }

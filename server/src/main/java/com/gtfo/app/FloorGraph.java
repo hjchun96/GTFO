@@ -43,7 +43,7 @@ public final class FloorGraph {
         }
 
         if (!grid[x][y]) {
-            throw new IllegalArgumentException("Pixel is a wall");
+            throw new IllegalArgumentException("You've selected a wall. Please move your endpoints.");
         }
 
         Set<Pixel> out = new HashSet<>();
