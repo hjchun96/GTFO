@@ -26,7 +26,6 @@ export default class BuildingScreen extends React.Component {
     };
   }
   state = {
-    directions: '',
     viewDirections: false,
     rendered_image: require('../assets/images/5.png'),
     building_name: '',
@@ -80,9 +79,6 @@ export default class BuildingScreen extends React.Component {
 											{startMarker}
 											{endMarker}
 											</ImageBackground>
-	          <Text style={styles.directions}>
-	            {this.state.directions}
-	          </Text>
 	        </View>
 									{button}
 	      </View>
@@ -144,7 +140,7 @@ export default class BuildingScreen extends React.Component {
   				rendered_image: {uri : image_string}
         });
   	  });
-      
+
   }
 
   _handleStartOver = async () => {
