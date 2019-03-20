@@ -58,11 +58,11 @@ export default class BuildingScreen extends React.Component {
 		}
 
 		if (this.state.startXCoord != -1) {
-			startMarker = <View style = {this._getStartMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/flame.png')} /></View>;
+			startMarker = <View style = {this._getStartMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/src.png')} /></View>;
 		}
 
-		if (this.state.startXCoord != -1) {
-			endMarker = <View style = {this._getEndMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/flame.png')} /></View>;
+		if (this.state.endXCoord != -1) {
+			endMarker = <View style = {this._getEndMarkerStyle()} pointerEvents="none"><Image style = {styles.overlay} source = {require('../assets/images/dest.png')} /></View>;
 		}
 
 	    const {navigation} = this.props;
