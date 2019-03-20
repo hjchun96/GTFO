@@ -12,7 +12,10 @@ import {
   ListItem,
   AsyncStorage,
 } from 'react-native';
+import { Icon, Header } from 'react-native-elements'
+import { Ionicons } from '@expo/vector-icons';
 import { getUserBuildings } from "../fetch/FetchWrapper";
+import logo1 from '../assets/images/logo1.png';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -28,33 +31,29 @@ export default class HomeScreen extends React.Component {
     }
     return (
       <View style={styles.container}>
+        <Header
+              placement="left"
+              containerStyle={styles.welcomeContainer}
+              backgroundColor="#0079C6"
+              centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
+        />
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={
-                __DEV__
-                  ? require('../assets/images/flame.png')
-                  : require('../assets/images/flame.png')
-              }
-              style={styles.welcomeImage}
-            />
-          </View>
           <FlatList
             data={buildings}
             renderItem={({item}) =>
-              <TouchableOpacity
+              <Button 
+                style={styles.item}
+                title={item.key}
+                textStyle={{ color: "#0079C6" }}
                 onPress={() => this._handleBuildingPressed(item.key)}
-                textStyle={{ color: "#bcbec1" }}>
-                <Text style={styles.item}>{item.key}</Text>
-              </TouchableOpacity>}
+              />}
           />
         </ScrollView>
         <Button
           buttonStyle={styles.addBuildingButton}
           title="Add a building"
-          textStyle={{ color: "#bcbec1" }}
+          textStyle={{ color: "#0079C6" }}
           onPress={() => this._handleAddBuildingButtonPressed()}
-          textStyle={{ color: "#bcbec1" }}
         />
       </View>
     );
@@ -81,15 +80,14 @@ const styles = StyleSheet.create({
   },
   welcomeContainer: {
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
+    paddingTop: 40,
   },
   welcomeImage: {
-    width: 100,
-    height: 80,
+    maxWidth: 110,
+    maxHeight: 50,
+    // width: auto,
+    // height: auto,
     resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
   },
   homeScreenFilename: {
     marginVertical: 7,
@@ -125,8 +123,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(247,247,247,1.0)',
   },
   item: {
-    padding: 10,
-    fontSize: 26,
+    paddingTop: 10,
+    paddingLeft: 10,
+    paddingBottom: 10,
+    paddingRight: 10,
+    fontSize: 30,
     height: 44,
+    fontFamily: "Roboto",
+  },
+  header: {
+    backgroundColor: "#0079C6",
+
   }
 });
