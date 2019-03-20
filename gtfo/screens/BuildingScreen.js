@@ -50,6 +50,11 @@ export default class BuildingScreen extends React.Component {
 					title="Get directions"
 					onPress={() => this._handleSetEnd()}
 			/>
+		} else if (routeStatus === "WAITING") {
+			button = <Button
+					title="Loading path"
+					onPress={function() {}}
+			/>
 		} else {
 			button = <Button
 					title="Start Over"
@@ -120,6 +125,7 @@ export default class BuildingScreen extends React.Component {
       destY_str = destY.toString();
       src = srcX_str.concat(",").concat(srcY_str);
       dest = destX_str.concat(",").concat(destY_str);
+      this.setState({routeStatus : "WAITING"});
 	  path_image = getImageWithPath(src, dest, this.state.building_name);
 	  path_image.then(response => {
 	  	return response.json();
