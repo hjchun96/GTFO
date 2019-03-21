@@ -100,10 +100,10 @@ export default class BuildingScreen extends React.Component {
       console.log("width: " + width);
       console.log("height: " + height);
 
-      newSrcX = this.state.startXCoord + 50;
-      newSrcY = this.state.startYCoord + 25;
-      newTgtX = this.state.endXCoord;
-      newTgtY = this.state.endYCoord + 75;
+      newSrcX = Math.max(this.state.startXCoord + 50, 0);
+      newSrcY = Math.max(this.state.startYCoord + 25, 0);
+      newTgtX = Math.min(this.state.endXCoord, 375 - 1);
+      newTgtY = Math.min(this.state.endYCoord + 75, 375 - 1);
 
       console.log("new srcX: " + newSrcX);
       console.log("new srcY: " + newSrcY);
