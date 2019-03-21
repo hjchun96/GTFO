@@ -17,7 +17,7 @@ import {
 } from "react-native-elements";
 
 import { getImageWithPath } from "../fetch/FetchWrapper";
-import picture from '../assets/images/5.png'
+import picture from '../assets/images/houston.png'
 export default class BuildingScreen extends React.Component {
   //
   static navigationOptions = ({ navigation }) => {
@@ -27,7 +27,7 @@ export default class BuildingScreen extends React.Component {
   }
   state = {
     viewDirections: false,
-    rendered_image: require('../assets/images/5.png'),
+    rendered_image: require('../assets/images/houston.png'),
     building_name: '',
 		startXCoord: -1,
 		startYCoord: -1,
@@ -111,10 +111,10 @@ export default class BuildingScreen extends React.Component {
       console.log("new destY: " + newTgtY);
 
 
-      srcX = newSrcX * width/400.0;
-      srcY = newSrcY * height/400.0;
-      destX = newTgtX * width/400.0;
-      destY = newTgtY * height/400.0;
+      srcX = newSrcX * width/375.0;
+      srcY = newSrcY * height/375.0;
+      destX = newTgtX * width/375.0;
+      destY = newTgtY * height/375.0;
       console.log("srcX: " + srcX);
       console.log("srcY: " + srcY);
       console.log("destX: " + destX);
@@ -141,7 +141,6 @@ export default class BuildingScreen extends React.Component {
 
   	  	this.setState({
   				routeStatus : "DIRECTIONS",
-  				directions: "1) Go to the exit.",
   				viewDirections: true,
   				rendered_image: {uri : image_string}
         });
@@ -156,7 +155,7 @@ export default class BuildingScreen extends React.Component {
 					endXCoord: -1,
 					endYCoord: -1,
 					routeStatus: "START",
-					rendered_image: require('../assets/images/5.png')
+					rendered_image: require('../assets/images/houston.png')
 				});
   }
 
@@ -204,8 +203,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   floorPlan: {
-    width: 400,
-    height: 400,
+    width: 375,
+    height: 375,
     resizeMode: 'contain',
     marginTop: -30,
     marginLeft: 0,

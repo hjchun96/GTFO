@@ -10,3 +10,5 @@ src/keys
 server/.idea/*
 cv/.idea/*
 *.iml
+.expo/
+.metadata/
