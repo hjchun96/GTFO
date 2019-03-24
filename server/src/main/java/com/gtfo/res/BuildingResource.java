@@ -51,6 +51,7 @@ public class BuildingResource {
     @GET
     public Response fetchAllBuildings(@PathParam("building") String building) {
         String response = buildingSvc.fetchAllBuildings();
+        System.out.println(response);
         return (response == null) ? Response.ok().build() : Response.ok().entity(response).build();
     }
 

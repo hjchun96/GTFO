@@ -61,13 +61,12 @@ export default class AddBuildingScreen extends React.Component {
             <FormLabel>Building Location</FormLabel>
             <View style={{}}>
               <FormInput
-
-                placeholder="Longitude..."
-                onChangeText={input => this.state.longitude = input}
-              />
-              <FormInput
                 placeholder="Latitude..."
                 onChangeText={input => this.state.latitude = input}
+              />
+              <FormInput
+                placeholder="Longitude..."
+                onChangeText={input => this.state.longitude = input}
               />
             </View>
           </Card>
