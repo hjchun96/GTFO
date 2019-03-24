@@ -95,10 +95,10 @@ export function getUserBuildings(email) {
   let url = api + 'building/';
   // TODO: get actual buildings for the user
   return [{
-      _id: "test",
-      name: "test",
-      image: [],
-      admins: [],
+     _id: "houston",
+     name: "houston",
+     image: [],
+     admins: [],
   }];
   // return [{
   //   _id: "test1",
