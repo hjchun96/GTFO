@@ -15,6 +15,11 @@ import {
   FormLabel,
   FormInput
 } from "react-native-elements";
+import {
+  AppRegistry,
+  TextInput
+} from 'react-native';
+import PinchZoomView from 'react-native-pinch-zoom-view';
 
 import { getImageWithPath } from "../fetch/FetchWrapper";
 import picture from '../assets/images/houston.png'
@@ -73,21 +78,29 @@ export default class BuildingScreen extends React.Component {
 	    const {navigation} = this.props;
 	    this.state.building_name = navigation.getParam('building_name', 'undefined');
 	    return (
-					<TouchableWithoutFeedback onPress={(evt) => this._handlePress(evt) } >
-	      <View style={styles.container}>
 
-	        <View style={styles.contentContainer}>
-	          <ImageBackground
-	            source = {this.state.rendered_image}
-	            style = {styles.floorPlan}
-	          >
-											{startMarker}
-											{endMarker}
-											</ImageBackground>
-	        </View>
+						<React.Fragment>
+						<PinchZoomView minScale = {1.0} maxScale = {4.0}>
+							<TouchableWithoutFeedback onPress={(evt) => this._handlePress(evt) } >
+			      <View style={styles.container}>
+
+			        <View style={styles.contentContainer}>
+			          <ImageBackground
+			            source = {this.state.rendered_image}
+			            style = {styles.floorPlan}
+			          >
+													{endMarker}
+													{startMarker}
+
+													</ImageBackground>
+			        </View>
+			      </View>
+									</TouchableWithoutFeedback>
+								</PinchZoomView>
+								<View>
 									{button}
-	      </View>
-						</TouchableWithoutFeedback>
+								</View>
+								</React.Fragment>
     	);
 	  }
 
@@ -100,10 +113,11 @@ export default class BuildingScreen extends React.Component {
       console.log("width: " + width);
       console.log("height: " + height);
 
-      newSrcX = Math.max(Math.min(this.state.startXCoord + 50, 375 - 1), 0);
-      newSrcY = Math.max(Math.min(this.state.startYCoord + 25, 375 - 1), 0);
-      newTgtX = Math.max(Math.min(this.state.endXCoord, 375 - 1), 0);
-      newTgtY = Math.max(Math.min(this.state.endYCoord + 75, 375 - 1), 0);
+						newSrcX = this.state.startXCoord;
+						newSrcY = this.state.startYCoord;
+						newTgtX = this.state.endXCoord;
+						newTgtY = this.state.endYCoord;
+
 
       console.log("new srcX: " + newSrcX);
       console.log("new srcY: " + newSrcY);
@@ -115,10 +129,7 @@ export default class BuildingScreen extends React.Component {
       srcY = newSrcY * height/375.0;
       destX = newTgtX * width/375.0;
       destY = newTgtY * height/375.0;
-      console.log("srcX: " + srcX);
-      console.log("srcY: " + srcY);
-      console.log("destX: " + destX);
-      console.log("destY: " + destY);
+
       srcX_str = srcX.toString();
       srcY_str = srcY.toString();
       destX_str = destX.toString();
@@ -130,6 +141,7 @@ export default class BuildingScreen extends React.Component {
 	  path_image.then(response => {
 	  	return response.json();
   	  }).then(json => {
+						console.log("error");
   	  	console.log(json.err);
   	  	if(json.err) {
   	  		Alert.alert("Invalid Start / End location selected", json.err[0]);
@@ -162,12 +174,12 @@ export default class BuildingScreen extends React.Component {
 		_handlePress = async (evt) => {
 
 			if (this.state.routeStatus == "START") {
-				this.setState({ startXCoord: evt.nativeEvent.locationX - 25,
-				 														 startYCoord: evt.nativeEvent.locationY - 25
+				this.setState({ startXCoord: evt.nativeEvent.locationX,
+				 														 startYCoord: evt.nativeEvent.locationY
 																	});
 			} else if (this.state.routeStatus == "END") {
-				this.setState({ endXCoord: evt.nativeEvent.locationX - 50,
-				 														 endYCoord: evt.nativeEvent.locationY -75
+				this.setState({ endXCoord: evt.nativeEvent.locationX,
+				 														 endYCoord: evt.nativeEvent.locationY
 																	});
 			}
 			console.log("Registered click");
@@ -176,16 +188,18 @@ export default class BuildingScreen extends React.Component {
 
 		_getStartMarkerStyle = function() {
 				return {
-						left: this.state.startXCoord,
-						top: this.state.startYCoord,
+						left: this.state.startXCoord - 25,
+						top: this.state.startYCoord - 25,
+						position: 'absolute',
 						alignItems: 'flex-start',
 	   }
   }
 
 		_getEndMarkerStyle = function() {
 				return {
-						left: this.state.endXCoord,
-						top: this.state.endYCoord,
+						left: this.state.endXCoord - 25,
+						top: this.state.endYCoord - 25,
+						position: 'absolute',
 						alignItems: 'flex-start',
 	   }
   }
@@ -223,7 +237,7 @@ const styles = StyleSheet.create({
         opacity: 0.5,
 								width: 50,
 				    height: 50,
-								alignItems: 'flex-end',
+								// alignItems: 'flex-end',
         backgroundColor: 'transparent'
   }
 });
