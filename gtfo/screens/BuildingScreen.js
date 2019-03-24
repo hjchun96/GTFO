@@ -43,14 +43,16 @@ export default class BuildingScreen extends React.Component {
 
   render() {
 
-		const routeStatus = this.state.routeStatus;
+		let routeStatus = this.state.routeStatus;
+		console.log("route staus: " + this.state.routeStatus);
+		console.log("equality" + (this.state.routeStatus === "END"));
 		let button, startMarker, endMarker;
-		if (routeStatus === "START") {
-			button = <Button
-					title="Choose Endpoint"
-					onPress={() => this._handleSetStart()}
-			/>
+		console.log("re-rendering");
+		if (routeStatus === "START" || routeStatus === "WAITING_FOR_ENDPOINT") {
+			console.log("got in here for some reason");
+			button = <View></View>
 		} else if (routeStatus === "END") {
+			console.log("getting in here yo");
 			button = <Button
 					title="Get directions"
 					onPress={() => this._handleSetEnd()}
@@ -104,10 +106,6 @@ export default class BuildingScreen extends React.Component {
 								</React.Fragment>
     	);
 	  }
-
-	_handleSetStart = async () => {
-		this.setState({routeStatus : "END"});
-	}
 
 		_handleSetEnd = async () => {
       const {width, height} = Image.resolveAssetSource(picture);
@@ -173,10 +171,16 @@ export default class BuildingScreen extends React.Component {
   }
 
 		_handlePress = async (evt) => {
-
+			console.log(this.state.routeStatus);
 			if (this.state.routeStatus == "START") {
 				this.setState({ startXCoord: evt.nativeEvent.locationX,
-				 														 startYCoord: evt.nativeEvent.locationY
+				 														 startYCoord: evt.nativeEvent.locationY,
+																				routeStatus : "WAITING_FOR_ENDPOINT",
+																	});
+			} else if (this.state.routeStatus == "WAITING_FOR_ENDPOINT") {
+				this.setState({ endXCoord: evt.nativeEvent.locationX,
+				 														 endYCoord: evt.nativeEvent.locationY,
+																				routeStatus : "END",
 																	});
 			} else if (this.state.routeStatus == "END") {
 				this.setState({ endXCoord: evt.nativeEvent.locationX,
@@ -190,7 +194,7 @@ export default class BuildingScreen extends React.Component {
 		_getStartMarkerStyle = function() {
 				return {
 						left: this.state.startXCoord - 25,
-						top: this.state.startYCoord - 25,
+						top: this.state.startYCoord - 50,
 						position: 'absolute',
 						alignItems: 'flex-start',
 	   }
@@ -199,7 +203,7 @@ export default class BuildingScreen extends React.Component {
 		_getEndMarkerStyle = function() {
 				return {
 						left: this.state.endXCoord - 25,
-						top: this.state.endYCoord - 25,
+						top: this.state.endYCoord - 50,
 						position: 'absolute',
 						alignItems: 'flex-start',
 	   }
@@ -238,6 +242,7 @@ const styles = StyleSheet.create({
         opacity: 0.5,
 								width: 50,
 				    height: 50,
+								resizeMode: 'contain',
 								// alignItems: 'flex-end',
         backgroundColor: 'transparent'
   }
