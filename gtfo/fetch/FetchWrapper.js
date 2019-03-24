@@ -20,7 +20,7 @@ export function checkUser(email, password) {
   return fetch(url)
     .then(response => response.json())
     .then(responseJson => {
-      return responseJson && responseJson.pass == password;
+      return responseJson && responseJson.user;
     });
 };
 
@@ -64,8 +64,10 @@ export function checkBuilding(buildingName) {
  *
  * Params: building name, base-64 representation of floorplan image
  **/
-export function createBuilding(name, image) {
+export function createBuilding(name, image, latitude, longitude) {
   let url = api + 'building/addFloorplan/' + name;
+  console.log("Latitude: " + latitude)
+  console.log("Longitude: " + longitude)
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -74,6 +76,8 @@ export function createBuilding(name, image) {
     },
     body: JSON.stringify({
       img: image,
+      lat: latitude,
+      lon: longitude,
     })
   }).then(response => console.log(response));
 }

@@ -2,9 +2,12 @@ package com.gtfo.res;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.Bucket;
+import com.gtfo.app.Helpers;
 import com.mongodb.client.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,8 +48,27 @@ public class UserSvc {
         return doc.toJson();
     }
 
+    /**
+     * Fetch user only if password matches
+     */
+    public String fetchUser(String userId, String password) {
+        String user = fetchUser(userId);
+        password = Helpers.getSha256(password);
+        try {
+            JSONObject jsonObject = new JSONObject(user);
+            String storedPass = jsonObject.getString("pass");
+            if (password.equals(storedPass)) {
+                return user;
+            }
+        } catch (JSONException e) {
+            /* nothing to do here */
+        }
+        return null;
+    }
+
     public void createUser(String username, String password) {
         Document user = new Document("user", username);
+        password = Helpers.getSha256(password);
         user.append("pass", password);
         userCollection.insertOne(user);
     }

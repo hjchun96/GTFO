@@ -56,15 +56,23 @@ export default class SignInScreen extends React.Component {
       alert("Please fill out all fields.");
       return;
     }
-    // TODO: check that the user is valid
-    if (!checkUser(this.state.email, this.state.password)) {
-      alert("Invalid email or password.")
-    }
 
-    await AsyncStorage.setItem('userToken', this.state.email);
-    this.props.navigation.navigate('Main');
+    checkUser(this.state.email, this.state.password)
+      .then(res => {
+        if (!res) {
+          alert("Invalid email or password.");
+          return null;
+        } else {
+          AsyncStorage.setItem('userToken', this.state.email);
+          return this.state.email;
+        }
+      })
+      .then(res => {
+        if (res) {
+          this.props.navigation.navigate('Main');
+        }
+      });
   }
-
 }
 
 const styles = StyleSheet.create({

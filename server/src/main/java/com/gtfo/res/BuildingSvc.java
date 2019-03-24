@@ -65,11 +65,10 @@ public class BuildingSvc {
         }
     }
 
-    public void addFloorplan(String name, String img, String type) {
+    public void addFloorplan(String name, String img, String type, String lat, String lon) {
         byte[] imageByteArray = Base64.decodeBase64(img);
         String extension = "png";
         String imgName = type + "/" + name + "." + extension;
-        System.out.println(imgName);
         try {
             InputStream fileInputStream = new ByteArrayInputStream(imageByteArray);
             ObjectMetadata metadata = new ObjectMetadata();
@@ -81,6 +80,8 @@ public class BuildingSvc {
         }
         Document building = new Document("name", name);
         building.append("s3_url", name);
+        building.append("lat", lat);
+        building.append("lon", lon);
         buildingCollection.insertOne(building);
     }
 

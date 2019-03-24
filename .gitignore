@@ -12,3 +12,4 @@ cv/.idea/*
 *.iml
 .expo/
 .metadata/
+server/*.iml

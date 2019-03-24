@@ -1,7 +1,7 @@
 import React from "react";
 import { View, AsyncStorage } from "react-native";
 import { Card, Button, FormLabel, FormInput } from "react-native-elements";
-import { checkUser, createUser } from "../fetch/FetchWrapper";
+import { checkUser, createUser, userExists } from "../fetch/FetchWrapper";
 
 export default class SignUpScreen extends React.Component {
   static navigationOptions = {
@@ -54,16 +54,28 @@ export default class SignUpScreen extends React.Component {
       return;
     }
 
-    if (checkUser(this.state.email, this.state.password)) {
-      alert("An account with this email address already exists. Please try again.");
-      return;
-    }
-
-    let email = this.state.email;
-    let password = this.state.password;
-
-    createUser(this.state.email, this.state.password)
-      .then(response => AsyncStorage.setItem('userToken', this.state.email))
-      .then(this.props.navigation.navigate('Main'));
+    userExists(this.state.email)
+      .then(res => {
+        if (res) {
+          alert("An account with this email address already exists. Please try again.");
+          return null;
+        } else {
+          let email = this.state.email;
+          let password = this.state.password;
+          createUser(this.state.email, this.state.password);
+          return email;
+        }
+      })
+      .then(success => {
+        if (success) {
+          AsyncStorage.setItem('userToken', this.state.email);
+          return this.state.email;
+        }
+      })
+      .then(success => {
+        if (success) {
+          this.props.navigation.navigate('Main');
+        }
+      });
   }
 }
