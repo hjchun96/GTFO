@@ -28,10 +28,11 @@ public class BuildingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createBuilding(String body, @PathParam("floorplanName") String floorplanName)
             throws JSONException {
-        System.out.println("Building: " + floorplanName);
         JSONObject json = new JSONObject(body);
         String img = json.getString("img");
-        buildingSvc.addFloorplan(floorplanName, img, "floorplans");
+        String lat = json.getString("lat");
+        String lon = json.getString("lon");
+        buildingSvc.addFloorplan(floorplanName, img, "floorplans", lat, lon);
 
         // ADD FLASK SERVER CALL
         return Response.ok().build();
