@@ -9,6 +9,9 @@ import java.util.*;
 
 public final class FloorGraph {
 
+    /** Distance to search through if the selected pixels are walls. */
+    final int APPROX_DIAM = 20;
+
     public boolean[][] grid;
 
     /**
@@ -38,15 +41,15 @@ public final class FloorGraph {
         int x = p.x;
         int y = p.y;
 
+        Set<Pixel> out = new HashSet<>();
+
         if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length) {
             throw new IllegalArgumentException("Coordinates out of bounds");
         }
 
         if (!grid[x][y]) {
-            throw new IllegalArgumentException("You've selected a wall. Please move your endpoints.");
+            return out;
         }
-
-        Set<Pixel> out = new HashSet<>();
 
         if (x > 0 && grid[x-1][y]) {
             out.add(new Pixel(x-1, y));
@@ -83,6 +86,62 @@ public final class FloorGraph {
         return out;
     }
 
+    private int distanceBetween(Pixel a, Pixel b) {
+        return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    }
+
+    /**
+     * Helper - finds closest non-wall pixel.
+     * @param src .
+     * @param diameter how far to look
+     * @return Pixel if successful, else null if all are walls
+     */
+    private Pixel getClosestNonWall(Pixel src, int diameter) {
+        boolean[][] visited = new boolean[grid.length][grid[0].length];
+        LinkedList<Pixel> queue = new LinkedList<>();
+        queue.add(src);
+        visited[src.x][src.y] = true;
+
+        while(!queue.isEmpty()) {
+            Pixel curr = queue.poll();
+
+            // Skip if too far
+            if (distanceBetween(curr, src) > diameter) {
+                continue;
+            }
+
+            // Found it!
+            if (grid[curr.x][curr.y]) {
+                return curr;
+            }
+
+            // Otherwise add neighbours (regardless of whether they are a wall)
+            Set<Pixel> neighbours = new HashSet<>();
+
+            if (curr.x > 0) {
+                neighbours.add(new Pixel(curr.x-1, curr.y));
+            }
+            if (curr.x < grid.length - 1) {
+                neighbours.add(new Pixel(curr.x+1, curr.y));
+            }
+            if (curr.y > 0) {
+                neighbours.add(new Pixel(curr.x, curr.y-1));
+            }
+            if (curr.y < grid[0].length - 1) {
+                neighbours.add(new Pixel(curr.x, curr.y+1));
+            }
+
+            for (Pixel n : neighbours) {
+                if (!visited[n.x][n.y]) {
+                    visited[n.x][n.y] = true;
+                    queue.offer(n);
+                }
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Get the shortest path using BFS.
      * @param src .
@@ -90,6 +149,14 @@ public final class FloorGraph {
      * @return Path as a List of Pixels, or NULL if unreachable.
      */
     public List<Pixel> getShortestPath(Pixel src, Pixel tgt) {
+        // If src/tgt is a wall, replace with first, closest pixel that's not a wall
+        src = getClosestNonWall(src, APPROX_DIAM);
+        tgt = getClosestNonWall(tgt, APPROX_DIAM);
+
+        if (src == null || tgt == null) {
+            throw new IllegalArgumentException("You've selected a wall. Please move your endpoints.");
+        }
+
         boolean[][] visited = new boolean[grid.length][grid[0].length];
         Pixel[][] parentGraph = new Pixel[grid.length][grid[0].length];
         LinkedList<Pixel> queue = new LinkedList<>();
@@ -234,14 +301,14 @@ public final class FloorGraph {
     public static void main(String[] args) {
         try {
             // Load the image
-            String imagePath = "/Users/oliverchan/Desktop/floorplan.png";
-            String graphPath = "/Users/oliverchan/Desktop/graph.png";
+            String imagePath = "/Users/oliverchan/Desktop/test.png";
+            String graphPath = "/Users/oliverchan/Desktop/test.png";
 
             // Compute the path image
             BufferedImage img = ImageIO.read(new File(imagePath));
             BufferedImage graphImg = ImageIO.read(new File(graphPath));
-            Pixel src = new Pixel(800, 1000);
-            Pixel tgt = new Pixel(3000, 1000);
+            Pixel src = new Pixel(500, 626);
+            Pixel tgt = new Pixel(500, 1077);
             BufferedImage drawnPath = drawPath(img, graphImg, src, tgt);
 
             // Save the image as "path.png"
