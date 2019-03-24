@@ -104,7 +104,7 @@ public class BuildingSvc {
     public String fetchAllBuildings() {
         return StreamSupport.stream(buildingCollection.find().spliterator(), false)
                 .map(Document::toJson)
-                .collect(Collectors.joining(", ", "{", "}"));
+                .collect(Collectors.joining(", ", "[", "]"));
     }
 
     public String fetchBuildingOnPrefix(int limit, String prefix) {
