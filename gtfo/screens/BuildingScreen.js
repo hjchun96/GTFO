@@ -86,6 +86,7 @@ export default class BuildingScreen extends React.Component {
 
 			        <View style={styles.contentContainer}>
 			          <ImageBackground
+                  resizeMode="contain"
 			            source = {this.state.rendered_image}
 			            style = {styles.floorPlan}
 			          >

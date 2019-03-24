@@ -283,14 +283,23 @@ public final class FloorGraph {
     public static BufferedImage drawPath(BufferedImage floorPlan, BufferedImage graphImg, Pixel src, Pixel tgt) throws IOException {
         FloorGraph g = new FloorGraph(gridFromImg(graphImg));
 
+        // Shift src and tgt to something on screen
+        Pixel boundedSrc = new Pixel(Math.min(Math.max(src.x, 0), g.grid.length - 1), Math.min(Math.max(src.y, 0), g.grid[0].length - 1));
+        Pixel boundedTgt = new Pixel(Math.min(Math.max(tgt.x, 0), g.grid.length - 1), Math.min(Math.max(tgt.y, 0), g.grid[0].length - 1));
+
         // Do BFS, then draw the path over in bright red
         final int RED = -16777216 + (255 << 16);
-        Optional.ofNullable(g.getShortestPath(src, tgt))
+        Optional.ofNullable(g.getShortestPath(boundedSrc, boundedTgt))
                 .orElse(new LinkedList<>())
                 .forEach(p -> {
                     final int LINE_THICKNESS = 10;
                     for (int i = -LINE_THICKNESS + 1; i < LINE_THICKNESS; i++) {
                         for (int j = -LINE_THICKNESS + 1; j < LINE_THICKNESS; j++) {
+                            int newX = p.x + i;
+                            int newY = p.y + j;
+                            if (newX < 0 || newX >= g.grid.length || newY < 0 || newY >= g.grid[0].length) {
+                                continue;
+                            }
                             floorPlan.setRGB(p.x + i, p.y + j, RED);
                         }
                     }
@@ -307,8 +316,8 @@ public final class FloorGraph {
             // Compute the path image
             BufferedImage img = ImageIO.read(new File(imagePath));
             BufferedImage graphImg = ImageIO.read(new File(graphPath));
-            Pixel src = new Pixel(500, 626);
-            Pixel tgt = new Pixel(500, 1077);
+            Pixel src = new Pixel(2000, -5);
+            Pixel tgt = new Pixel(3001, 1500);
             BufferedImage drawnPath = drawPath(img, graphImg, src, tgt);
 
             // Save the image as "path.png"

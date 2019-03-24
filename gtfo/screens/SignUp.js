@@ -1,5 +1,5 @@
 import React from "react";
-import { View, AsyncStorage } from "react-native";
+import { View, ScrollView, AsyncStorage } from "react-native";
 import { Card, Button, FormLabel, FormInput } from "react-native-elements";
 import { checkUser, createUser, userExists } from "../fetch/FetchWrapper";
 
@@ -16,7 +16,7 @@ export default class SignUpScreen extends React.Component {
 
   render() {
     return (
-      <View style={{ paddingVertical: 20 }}>
+      <ScrollView style={{ paddingVertical: 20 }}>
         <Card>
           <FormLabel>Email</FormLabel>
           <FormInput
@@ -39,7 +39,7 @@ export default class SignUpScreen extends React.Component {
             onPress={() => this._signUpAsync()}
           />
         </Card>
-      </View>
+      </ScrollView>
     );
   }
 

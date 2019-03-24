@@ -16,6 +16,7 @@ import {
 } from "react-native-elements";
 // import RNFS from 'react-native-fs';
 import { checkBuilding, createBuilding } from "../fetch/FetchWrapper";
+import KeyboardShift from '../components/KeyboardShift';
 
 export default class AddBuildingScreen extends React.Component {
   static navigationOptions = {
@@ -31,50 +32,54 @@ export default class AddBuildingScreen extends React.Component {
 
   render() {
     return (
-      <ScrollView style={{ paddingVertical: 20, marginBottom: 20 }}>
-        <Card>
-          <FormLabel>Building Name</FormLabel>
-          <FormInput
-            placeholder="Name..."
-            onChangeText={input => this.state.name = input}
-          />
-        </Card>
-        <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <FormLabel>Floorplan Image</FormLabel>
-          {this.state.photo && (
-            <Image
-              source={{ uri: this.state.photo.uri }}
-              style={{ width: 150, height: 150 }}
-            />)
-          }
-          <Button
-            buttonStyle={{ marginTop: 20, marginBottom: 20 }}
-            backgroundColor="#03A9F4"
-            title="Choose floorplan image"
-            onPress={() => this._handleChoosePhoto()}
-          />
-        </Card>
-        <Card>
-          <FormLabel>Building Location</FormLabel>
-          <View style={{}}>
+      <KeyboardShift>
+        {() => (
+        <ScrollView style={{ paddingVertical: 20, marginBottom: 20 }}>
+          <Card>
+            <FormLabel>Building Name</FormLabel>
             <FormInput
+              placeholder="Name..."
+              onChangeText={input => this.state.name = input}
+            />
+          </Card>
+          <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <FormLabel>Floorplan Image</FormLabel>
+            {this.state.photo && (
+              <Image
+                source={{ uri: this.state.photo.uri }}
+                style={{ width: 150, height: 150 }}
+              />)
+            }
+            <Button
+              buttonStyle={{ marginTop: 20, marginBottom: 20 }}
+              backgroundColor="#03A9F4"
+              title="Choose floorplan image"
+              onPress={() => this._handleChoosePhoto()}
+            />
+          </Card>
+          <Card>
+            <FormLabel>Building Location</FormLabel>
+            <View style={{}}>
+              <FormInput
 
-              placeholder="Longitude..."
-              onChangeText={input => this.state.longitude = input}
-            />
-            <FormInput
-              placeholder="Latitude..."
-              onChangeText={input => this.state.latitude = input}
-            />
-          </View>
-        </Card>
-        <Button
-          buttonStyle={{ marginTop: 20, marginBottom: 20}}
-          backgroundColor="#03A9F4"
-          title="Register building"
-          onPress={() => this._addBuilding()}
-        />
-    </ScrollView>);
+                placeholder="Longitude..."
+                onChangeText={input => this.state.longitude = input}
+              />
+              <FormInput
+                placeholder="Latitude..."
+                onChangeText={input => this.state.latitude = input}
+              />
+            </View>
+          </Card>
+          <Button
+            buttonStyle={{ marginTop: 20, marginBottom: 20}}
+            backgroundColor="#03A9F4"
+            title="Register building"
+            onPress={() => this._addBuilding()}
+          />
+      </ScrollView>)}
+    </KeyboardShift>
+    );
   }
   // TODO: have a button that allows adding additional floorplan images
 
