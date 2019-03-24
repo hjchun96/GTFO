@@ -291,6 +291,11 @@ public final class FloorGraph {
                     final int LINE_THICKNESS = 10;
                     for (int i = -LINE_THICKNESS + 1; i < LINE_THICKNESS; i++) {
                         for (int j = -LINE_THICKNESS + 1; j < LINE_THICKNESS; j++) {
+                            int newX = p.x + i;
+                            int newY = p.y + j;
+                            if (newX < 0 || newX >= g.grid.length || newY < 0 || newY >= g.grid[0].length) {
+                                continue;
+                            }
                             floorPlan.setRGB(p.x + i, p.y + j, RED);
                         }
                     }
