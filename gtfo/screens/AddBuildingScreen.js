@@ -24,40 +24,57 @@ export default class AddBuildingScreen extends React.Component {
 
   state = {
     name: '',
+    longitude: '',
+    latitude: '',
     photo: null,
   }
 
   render() {
     return (
-      <View style={{ paddingVertical: 20 }}>
+      <ScrollView style={{ paddingVertical: 20, marginBottom: 20 }}>
         <Card>
           <FormLabel>Building Name</FormLabel>
           <FormInput
             placeholder="Name..."
             onChangeText={input => this.state.name = input}
           />
-          <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            {this.state.photo && (
-              <Image
-                source={{ uri: this.state.photo.uri }}
-                style={{ width: 150, height: 150 }}
-              />)
-            }
-          </Card>
+        </Card>
+        <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <FormLabel>Floorplan Image</FormLabel>
+          {this.state.photo && (
+            <Image
+              source={{ uri: this.state.photo.uri }}
+              style={{ width: 150, height: 150 }}
+            />)
+          }
           <Button
             buttonStyle={{ marginTop: 20, marginBottom: 20 }}
             backgroundColor="#03A9F4"
             title="Choose floorplan image"
             onPress={() => this._handleChoosePhoto()}
           />
-          <Button
-            buttonStyle={{ marginTop: 20 }}
-            backgroundColor="#03A9F4"
-            title="Register building"
-            onPress={() => this._addBuilding()}
-          />
-      </Card>
-    </View> );
+        </Card>
+        <Card>
+          <FormLabel>Building Location</FormLabel>
+          <View style={{}}>
+            <FormInput
+
+              placeholder="Longitude..."
+              onChangeText={input => this.state.longitude = input}
+            />
+            <FormInput
+              placeholder="Latitude..."
+              onChangeText={input => this.state.latitude = input}
+            />
+          </View>
+        </Card>
+        <Button
+          buttonStyle={{ marginTop: 20, marginBottom: 20}}
+          backgroundColor="#03A9F4"
+          title="Register building"
+          onPress={() => this._addBuilding()}
+        />
+    </ScrollView>);
   }
   // TODO: have a button that allows adding additional floorplan images
 
@@ -80,24 +97,35 @@ export default class AddBuildingScreen extends React.Component {
     this.setState({photo: result});
   }
 
+  _clearState = async () => {
+    this.state.name = '';
+    this.state.photo = null;
+    this.state.longitude = '';
+    this.state.latitude = '';
+  }
+
   _addBuilding = async () => {
     if (!this.state.name || !this.state.photo) {
       alert("Please fill out all fields and choose a floorplan image.");
-      this.state.name = null;
-      this.state.photo = null;
+      this._clearState();
       return;
     }
 
     if (!checkBuilding(this.state.name)) {
       alert("Building name already exists. Please pick a different name.");
-      this.state.name = null;
-      this.state.photo = null;
+      this._clearState();
       return;
+    }
+
+    if (!this.state.longitude || !this.state.latitude) {
+      alert("Please input the coordinates for the building")
+      this._clearState();
     }
 
     let user = await AsyncStorage.getItem('userToken');
     // TODO: make user admin
-    createBuilding(this.state.name, this.state.photo.base64);
+    createBuilding(this.state.name, this.state.photo.base64, 
+      this.state.longitude, this.state.latitude);
 
     this.props.navigation.navigate('Building');
   }
