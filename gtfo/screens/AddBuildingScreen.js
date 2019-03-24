@@ -107,13 +107,11 @@ export default class AddBuildingScreen extends React.Component {
   _addBuilding = async () => {
     if (!this.state.name || !this.state.photo) {
       alert("Please fill out all fields and choose a floorplan image.");
-      this._clearState();
       return;
     }
 
     if (!this.state.longitude || !this.state.latitude) {
       alert("Please input the coordinates for the building")
-      this._clearState();
       return;
     }
 
@@ -121,7 +119,6 @@ export default class AddBuildingScreen extends React.Component {
       .then(res => {
         if (res) {
           alert("Building name already exists. Please pick a different name.");
-          this._clearState();
           return null;
         } else {
           return AsyncStorage.getItem('userToken');
@@ -138,8 +135,7 @@ export default class AddBuildingScreen extends React.Component {
       })
       .then(success => {
         if (success) {
-          this._clearState();
-          this.props.navigation.navigate('Building');
+          this.props.navigation.navigate('Building', {building_name: this.state.name});
         }
       });
   }
