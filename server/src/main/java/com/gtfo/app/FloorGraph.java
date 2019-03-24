@@ -178,7 +178,7 @@ public final class FloorGraph {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("Unable to find a path - points may be unreachable.");
     }
 
     public static class Pixel {
