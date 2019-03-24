@@ -20,7 +20,7 @@ export function checkUser(email, password) {
   return fetch(url)
     .then(response => response.json())
     .then(responseJson => {
-      return responseJson && responseJson.pass == password;
+      return responseJson && responseJson.user;
     });
 };
 

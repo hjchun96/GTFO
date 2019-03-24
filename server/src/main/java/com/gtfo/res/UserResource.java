@@ -27,6 +27,17 @@ public class UserResource {
         return Response.ok().entity(user).build();
     }
 
+    @GET
+    @Path("{user}/{pass}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response validateUser(@PathParam("user") String userId, @PathParam("pass") String pass) {
+        String user = userSvc.fetchUser(userId);
+        if (user == null) {
+            return Response.ok().build();
+        }
+        return Response.ok().entity(user).build();
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
