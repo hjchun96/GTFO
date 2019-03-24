@@ -111,23 +111,37 @@ export default class AddBuildingScreen extends React.Component {
       return;
     }
 
-    if (!checkBuilding(this.state.name)) {
-      alert("Building name already exists. Please pick a different name.");
+    if (!this.state.longitude || !this.state.latitude) {
+      alert("Please input the coordinates for the building")
       this._clearState();
       return;
     }
 
-    if (!this.state.longitude || !this.state.latitude) {
-      alert("Please input the coordinates for the building")
-      this._clearState();
-    }
-
-    let user = await AsyncStorage.getItem('userToken');
-    // TODO: make user admin
-    createBuilding(this.state.name, this.state.photo.base64, 
-      this.state.longitude, this.state.latitude);
-
-    this.props.navigation.navigate('Building');
+    checkBuilding(this.state.name)
+      .then(res => {
+        if (res) {
+          alert("Building name already exists. Please pick a different name.");
+          this._clearState();
+          return null;
+        } else {
+          return AsyncStorage.getItem('userToken');
+        }
+      })
+      .then(user => {
+        if (user) {
+          createBuilding(this.state.name, this.state.photo.base64,
+            this.state.longitude, this.state.latitude)
+            return user;
+        } else {
+          return null;
+        }
+      })
+      .then(success => {
+        if (success) {
+          this._clearState();
+          this.props.navigation.navigate('Building');
+        }
+      });
   }
 
 }
