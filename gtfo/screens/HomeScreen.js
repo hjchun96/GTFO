@@ -40,8 +40,6 @@ export default class HomeScreen extends React.Component {
 
   render() {
     const { closestBuildings } = this.state;
-    console.log(closestBuildings)
-
     if (closestBuildings.length == 0) { return null }
 
     return (
