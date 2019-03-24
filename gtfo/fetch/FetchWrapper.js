@@ -66,8 +66,6 @@ export function checkBuilding(buildingName) {
  **/
 export function createBuilding(name, image, latitude, longitude) {
   let url = api + 'building/addFloorplan/' + name;
-  console.log("Latitude: " + latitude)
-  console.log("Longitude: " + longitude)
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -94,35 +92,11 @@ export function getImageWithPath(src, dst, building) {
   });
 };
 
-// TODO: add building to user
-export function getUserBuildings(email) {
+export async function getAllBuildings() {
   let url = api + 'building/';
-  // TODO: get actual buildings for the user
-  return [{
-     _id: "houston",
-     name: "houston",
-     image: [],
-     admins: [],
-  }];
-  // return [{
-  //   _id: "test1",
-  //   name: "Towne",
-  //   image: [],
-  //   admins: [],
-  // }, {
-  //   _id: "test2",
-  //   name: "Moore",
-  //   image: [],
-  //   admins: [],
-  // }, {
-  //   _id: "test2",
-  //   name: "Levine",
-  //   image: [],
-  //   admins: [],
-  // }, {
-  //   _id: "test3",
-  //   name: "DRL",
-  //   image: [],
-  //   admins: [],
-  // }];
+  var resp = await fetch(url, {
+    method: 'GET',
+  })
+  var json = await resp.json();
+  return json;
 }
