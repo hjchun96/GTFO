@@ -60,7 +60,7 @@ class CPDataset(Dataset):
           
         return sample
       
-data_dir = "CIS680_FINAL/data"
+'''data_dir = "CIS680_FINAL/data"
 
 files = os.listdir(data_dir)
 imgs = [i for i in files if i.endswith("png")]
@@ -68,10 +68,10 @@ imgs = [i for i in files if i.endswith("png")]
 np.random.seed(0)
 num_train = len(imgs)
 indices = list(range(num_train))
-split = int(num_train/5)
+split = int(num_train/5)'''
 
 # Random, non-contiguous split
-test_idx = np.random.choice(indices, size=split, replace=False)
+'''test_idx = np.random.choice(indices, size=split, replace=False)
 train_idx = list(set(indices) - set(test_idx))
 train_sampler = SubsetRandomSampler(train_idx)
 test_sampler = SubsetRandomSampler(test_idx)
@@ -82,17 +82,17 @@ trainingtransform = transforms.Compose(
      transforms.ToTensor()])
 testingtransform = transforms.Compose(
     [transforms.RandomCrop(512),
-     transforms.ToTensor()])
+     transforms.ToTensor()])'''
 # Un-Comment and comment the above lines if you're doing ROI Pooling
 # transform_img = transforms.Compose(
 #     [transforms.ToTensor()])
 
-dset_train = CPDataset(data_dir, transform = trainingtransform, num_samples = num_train - split, roi_pool = False)
+'''dset_train = CPDataset(data_dir, transform = trainingtransform, num_samples = num_train - split, roi_pool = False)
 dset_test = CPDataset(data_dir, transform = trainingtransform, num_samples = split, roi_pool = False)
 
 train_dataloader = DataLoader(dset_train, batch_size=batch_sz, shuffle=False, num_workers=1, sampler=train_sampler)
 test_dataloader = DataLoader(dset_test, batch_size=batch_sz, shuffle=False, num_workers=1, sampler=test_sampler)
-
+'''
 
 
 import torch
@@ -115,9 +115,7 @@ def display_img(image):
   plt.show()
   
   
-def run_nn(trainloader, testloader, learning_rate=10e-2):
-
-    class Net(nn.Module):
+class Net(nn.Module):
         def __init__(self):
             super(Net, self).__init__()
             n_class = 1
@@ -175,6 +173,8 @@ def run_nn(trainloader, testloader, learning_rate=10e-2):
 #             x = torch.sigmoid(self.convT4(x))
 
             return x
+
+def run_nn(trainloader, testloader, learning_rate=10e-2):
 
     net = Net()
     return net
@@ -319,9 +319,11 @@ def get_wall_segmentation_from_image(net, input_image):
       
 
 def feed_image_to_net(image_data): 
-  net = run_nn(train_dataloader, test_dataloader)
-  net.load_state_dict(torch.load('./GTFO.pt', map_location="cpu"))
+  #net = run_nn(train_dataloader, test_dataloader)
+  net = Net()
   device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+  net.load_state_dict(torch.load('./GTFO.pt', map_location="cpu"))
+  net.to(device)
   wall_segmentation = get_wall_segmentation_from_image(net, image_data)
   result = Image.fromarray(((1 - wall_segmentation) * 255).astype(np.uint8))
   result.save('output.png')
