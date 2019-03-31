@@ -21,19 +21,29 @@ import {
 } from 'react-native';
 import PinchZoomView from 'react-native-pinch-zoom-view';
 
-import { getImageWithPath } from "../fetch/FetchWrapper";
+import { getImageWithPath, getNNImage } from "../fetch/FetchWrapper";
 import picture from '../assets/images/houston.png'
 import SwitchButton from '../components/SwitchButton.js'
 export default class BuildingScreen extends React.Component {
-  //
+
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.getParam('building_name', 'undefined'),
     };
   }
+
+  componentDidMount = () => {
+    let image_string = this.props.navigation.getParam('img', '')
+    this.setState({
+      rendered_image: {uri: image_string },
+      loading: false,
+    });
+  }
+
   state = {
     viewDirections: false,
-    rendered_image: require('../assets/images/houston.png'),
+    rendered_image: '',
+    nn_image: '',
     building_name: '',
     startXCoord: -1,
     startYCoord: -1,
@@ -41,18 +51,22 @@ export default class BuildingScreen extends React.Component {
     endYCoord: -1,
     routeStatus: "START",
     switch1Value: false,
+    loading: true,
   }
 
   toggleSwitch1 = (value) => {
     this.setState({switch1Value: value})
-    console.log('Switch 1 is: ' + value)
   }
 
   render() {
+    if (this.state.loading) {
+      console.log("Hits here")
+      return null;
+    }
 
     let routeStatus = this.state.routeStatus;
-    console.log("route staus: " + this.state.routeStatus);
     let button, startMarker, endMarker;
+
     if (routeStatus === "START" || routeStatus === "WAITING_FOR_ENDPOINT") {
       button = <View></View>
     } else if (routeStatus === "END") {
@@ -92,11 +106,12 @@ export default class BuildingScreen extends React.Component {
       <View style={styles.contentContainer}>
       <ImageBackground
       resizeMode="contain"
-      source = {this.state.rendered_image}
+      source = {this.state.switch1Value ? this.state.nn_image : this.state.rendered_image}
       style = {styles.floorPlan}
       >
       {endMarker}
       {startMarker}
+
       </ImageBackground>
       </View>
       { this.state.routeStatus == "DIRECTIONS" && (
@@ -106,7 +121,6 @@ export default class BuildingScreen extends React.Component {
         switch1Value = {this.state.switch1Value}/>
         </View>)
       }
-
       </View>
       </TouchableWithoutFeedback>
       </PinchZoomView>
@@ -117,20 +131,14 @@ export default class BuildingScreen extends React.Component {
     );
   }
 
+
   _handleSetEnd = async () => {
     const {width, height} = Image.resolveAssetSource(picture);
-    console.log("width: " + width);
-    console.log("height: " + height);
 
     srcX = this.state.startXCoord * width / 375.0;
     srcY = (this.state.startYCoord - 43) * height / 288;
     tgtX = this.state.endXCoord * width / 375.0;
     tgtY = (this.state.endYCoord - 43) * height / 288;
-
-    console.log("srcX: " + srcX);
-    console.log("srcY: " + srcY);
-    console.log("tgtX: " + tgtX);
-    console.log("tgtY: " + tgtY);
 
     src = srcX.toString() + "," + srcY.toString();
     dest = tgtX.toString() + "," + tgtY.toString();
@@ -153,93 +161,108 @@ export default class BuildingScreen extends React.Component {
           rendered_image: {uri : image_string}
         });
       }});
-  }
 
-  _handleStartOver = async () => {
-    this.setState({
-      startXCoord: -1,
-      startYCoord: -1,
-      endXCoord: -1,
-      endYCoord: -1,
-      routeStatus: "START",
-      rendered_image: require('../assets/images/houston.png')
-    });
-  }
+      nn_image = getNNImage(this.state.building_name);
+      nn_image.then(response => {
+        return response.json();
+      }).then(json => {
+        if (json.err) {
+          console.log("error fetching NN image");
+          return;
+        } else {
+          var image_string = 'data:image/png;base64,'+json.img[0];
 
-  _handlePress = async (evt) => {
-    console.log(this.state.routeStatus);
-    if (this.state.routeStatus == "START") {
-      this.setState({ startXCoord: evt.nativeEvent.locationX,
-        startYCoord: evt.nativeEvent.locationY,
-        routeStatus : "WAITING_FOR_ENDPOINT",
-      });
-    } else if (this.state.routeStatus == "WAITING_FOR_ENDPOINT") {
-      this.setState({ endXCoord: evt.nativeEvent.locationX,
-        endYCoord: evt.nativeEvent.locationY,
-        routeStatus : "END",
-      });
-    } else if (this.state.routeStatus == "END") {
-      this.setState({ endXCoord: evt.nativeEvent.locationX,
-        endYCoord: evt.nativeEvent.locationY
+          this.setState({
+            nn_image: {uri : image_string}
+          });
+        }});
+    }
+
+    _handleStartOver = async () => {
+      this.setState({
+        startXCoord: -1,
+        startYCoord: -1,
+        endXCoord: -1,
+        endYCoord: -1,
+        routeStatus: "START",
+        rendered_image: this.state.rendered_image,
       });
     }
-    console.log("Registered click");
 
+    _handlePress = async (evt) => {
+      console.log(this.state.routeStatus);
+      if (this.state.routeStatus == "START") {
+        this.setState({ startXCoord: evt.nativeEvent.locationX,
+          startYCoord: evt.nativeEvent.locationY,
+          routeStatus : "WAITING_FOR_ENDPOINT",
+        });
+      } else if (this.state.routeStatus == "WAITING_FOR_ENDPOINT") {
+        this.setState({ endXCoord: evt.nativeEvent.locationX,
+          endYCoord: evt.nativeEvent.locationY,
+          routeStatus : "END",
+        });
+      } else if (this.state.routeStatus == "END") {
+        this.setState({ endXCoord: evt.nativeEvent.locationX,
+          endYCoord: evt.nativeEvent.locationY
+        });
+      }
+      console.log("Registered click");
+
+    }
+
+    _getStartMarkerStyle = function() {
+      return {
+        left: this.state.startXCoord - 25,
+        top: this.state.startYCoord - 50,
+        position: 'absolute',
+        alignItems: 'flex-start',
+      }
+    }
+
+    _getEndMarkerStyle = function() {
+      return {
+        left: this.state.endXCoord - 25,
+        top: this.state.endYCoord - 50,
+        position: 'absolute',
+        alignItems: 'flex-start',
+      }
+    }
   }
 
-  _getStartMarkerStyle = function() {
-    return {
-      left: this.state.startXCoord - 25,
-      top: this.state.startYCoord - 50,
-      position: 'absolute',
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+      alignItems: 'center',
+      paddingBottom: 30,
+    },
+    contentContainer: {
+      paddingTop: 30,
+      alignItems: 'center',
+    },
+    floorPlan: {
+      width: 375,
+      height: 375,
+      resizeMode: 'contain',
+      marginTop: -30,
+      marginLeft: 0,
+      paddingBottom: 30,
+    },
+    directions: {
+      fontSize: 30,
+      color: "red",
+    },
+    overlayContainer: {
+      left: 50,
+      top: 10,
       alignItems: 'flex-start',
+    },
+    overlay: {
+      opacity: 0.5,
+      width: 50,
+      height: 50,
+      resizeMode: 'contain',
+      // alignItems: 'flex-end',
+      backgroundColor: 'transparent'
     }
-  }
-
-  _getEndMarkerStyle = function() {
-    return {
-      left: this.state.endXCoord - 25,
-      top: this.state.endYCoord - 50,
-      position: 'absolute',
-      alignItems: 'flex-start',
-    }
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    paddingBottom: 30,
-  },
-  contentContainer: {
-    paddingTop: 30,
-    alignItems: 'center',
-  },
-  floorPlan: {
-    width: 375,
-    height: 375,
-    resizeMode: 'contain',
-    marginTop: -30,
-    marginLeft: 0,
-    paddingBottom: 30,
-  },
-  directions: {
-    fontSize: 30,
-    color: "red",
-  },
-  overlayContainer: {
-    left: 50,
-    top: 10,
-    alignItems: 'flex-start',
-  },
-  overlay: {
-    opacity: 0.5,
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
-    // alignItems: 'flex-end',
-    backgroundColor: 'transparent'
-  }
-});
+  });

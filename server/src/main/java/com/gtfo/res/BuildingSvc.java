@@ -121,6 +121,38 @@ public class BuildingSvc {
                 .collect(Collectors.joining(", ", "{", "}"));
     }
 
+    public String getFloorplanImage(String buildingId) throws IOException, JSONException {
+        try {
+            BufferedImage floorplan = createImageFromBytes(getFloorplanImageFromS3(buildingId));
+            
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(floorplan, "png", os);
+            JSONObject res = new JSONObject();
+            res.append("img", Base64.encodeBase64String(os.toByteArray()));
+            return res.toString();
+        } catch(IllegalArgumentException|AmazonServiceException e) {
+            JSONObject res = new JSONObject();
+            res.append("err", e.getMessage());
+            return res.toString();
+        }
+    }
+
+    public String getNNImage(String buildingId) throws IOException, JSONException {
+        try {
+            BufferedImage floorplan = createImageFromBytes(getNeuralNetImageFromS3(buildingId));
+
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(floorplan, "png", os);
+            JSONObject res = new JSONObject();
+            res.append("img", Base64.encodeBase64String(os.toByteArray()));
+            return res.toString();
+        } catch(IllegalArgumentException|AmazonServiceException e) {
+            JSONObject res = new JSONObject();
+            res.append("err", e.getMessage());
+            return res.toString();
+        }
+    }
+
     /**
      * Handles requests from users for paths in some building. Builds a response
      * @param src "x,y"
