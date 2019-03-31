@@ -24,28 +24,43 @@ import PinchZoomView from 'react-native-pinch-zoom-view';
 import { getImageWithPath } from "../fetch/FetchWrapper";
 import picture from '../assets/images/houston.png'
 export default class BuildingScreen extends React.Component {
-  //
+  
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.getParam('building_name', 'undefined'),
     };
   }
+
+  componentDidMount = () => {
+  	let image_string = this.props.navigation.getParam('img', '')
+  	this.setState({ 
+  		rendered_image: {uri: image_string },
+  		loading: false,
+  	});
+  }
+
   state = {
     viewDirections: false,
-    rendered_image: require('../assets/images/houston.png'),
+    rendered_image: '',
     building_name: '',
 		startXCoord: -1,
 		startYCoord: -1,
 		endXCoord: -1,
 		endYCoord: -1,
 		routeStatus: "START",
+	loading: true,
   }
 
   render() {
 
+  		if (this.state.loading) {
+  			console.log("Hits here")
+  			return null;
+  		}
+
 		let routeStatus = this.state.routeStatus;
-		console.log("route staus: " + this.state.routeStatus);
 		let button, startMarker, endMarker;
+
 		if (routeStatus === "START" || routeStatus === "WAITING_FOR_ENDPOINT") {
 			button = <View></View>
 		} else if (routeStatus === "END") {
@@ -105,18 +120,11 @@ export default class BuildingScreen extends React.Component {
 
 		_handleSetEnd = async () => {
       const {width, height} = Image.resolveAssetSource(picture);
-      console.log("width: " + width);
-      console.log("height: " + height);
 
 			srcX = this.state.startXCoord * width / 375.0;
 			srcY = (this.state.startYCoord - 43) * height / 288;
 			tgtX = this.state.endXCoord * width / 375.0;
 			tgtY = (this.state.endYCoord - 43) * height / 288;
-
-      console.log("srcX: " + srcX);
-      console.log("srcY: " + srcY);
-      console.log("tgtX: " + tgtX);
-      console.log("tgtY: " + tgtY);
 
       src = srcX.toString() + "," + srcY.toString();
       dest = tgtX.toString() + "," + tgtY.toString();
@@ -152,7 +160,7 @@ export default class BuildingScreen extends React.Component {
 					endXCoord: -1,
 					endYCoord: -1,
 					routeStatus: "START",
-					rendered_image: require('../assets/images/houston.png')
+					rendered_image: this.state.rendered_image,
 				});
   }
 

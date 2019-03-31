@@ -11,10 +11,11 @@ import {
   FlatList,
   ListItem,
   AsyncStorage,
+  Alert,
 } from 'react-native';
 import { Icon, Header } from 'react-native-elements'
 import { Ionicons } from '@expo/vector-icons';
-import { getAllBuildings } from "../fetch/FetchWrapper";
+import { getAllBuildings, getImage } from "../fetch/FetchWrapper";
 import { Location, Permissions, Constants } from 'expo';
 import logo1 from '../assets/images/logo1.png';
 
@@ -40,7 +41,19 @@ export default class HomeScreen extends React.Component {
 
   render() {
     const { closestBuildings } = this.state;
-    if (closestBuildings.length == 0) { return null }
+    if (closestBuildings.length == 0) { 
+      console.log("Loading closest buildings")
+      return (
+        <View style={styles.container}>
+          <Header
+              placement="left"
+              containerStyle={styles.welcomeContainer}
+              backgroundColor="#0079C6"
+              centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
+        />
+        </View>
+      )
+    }
 
     return (
       <View style={styles.container}>
@@ -91,7 +104,23 @@ export default class HomeScreen extends React.Component {
   }
 
   _handleBuildingPressed = (building_name) => {
-    this.props.navigation.navigate("Building", {building_name: building_name});
+    if (building_name != '') {
+      // Call endpoint
+      var image = getImage(building_name);
+      image.then(resp => resp.json())
+        .then(json => {
+          if (json.err) {
+            console.log("Error fetching image");
+            Alert.alert("Could not find floorplan image");
+          } else {
+            var image_string = 'data:image/png;base64,'+json.img[0];
+            this.props.navigation.navigate("Building", {
+              building_name: building_name,
+              img: image_string,
+            });
+          }
+        })
+    }
   }
 
   _getClosestBuildings = async () => {
