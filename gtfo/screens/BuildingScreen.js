@@ -45,14 +45,10 @@ export default class BuildingScreen extends React.Component {
 
 		let routeStatus = this.state.routeStatus;
 		console.log("route staus: " + this.state.routeStatus);
-		console.log("equality" + (this.state.routeStatus === "END"));
 		let button, startMarker, endMarker;
-		console.log("re-rendering");
 		if (routeStatus === "START" || routeStatus === "WAITING_FOR_ENDPOINT") {
-			console.log("got in here for some reason");
 			button = <View></View>
 		} else if (routeStatus === "END") {
-			console.log("getting in here yo");
 			button = <Button
 					title="Get directions"
 					onPress={() => this._handleSetEnd()}
@@ -112,29 +108,19 @@ export default class BuildingScreen extends React.Component {
       console.log("width: " + width);
       console.log("height: " + height);
 
-						newSrcX = this.state.startXCoord;
-						newSrcY = this.state.startYCoord;
-						newTgtX = this.state.endXCoord;
-						newTgtY = this.state.endYCoord;
+			srcX = this.state.startXCoord * width / 375.0;
+			srcY = (this.state.startYCoord - 43) * height / 288;
+			tgtX = this.state.endXCoord * width / 375.0;
+			tgtY = (this.state.endYCoord - 43) * height / 288;
 
+      console.log("srcX: " + srcX);
+      console.log("srcY: " + srcY);
+      console.log("tgtX: " + tgtX);
+      console.log("tgtY: " + tgtY);
 
-      console.log("new srcX: " + newSrcX);
-      console.log("new srcY: " + newSrcY);
-      console.log("new destX: " + newTgtX);
-      console.log("new destY: " + newTgtY);
+      src = srcX.toString() + "," + srcY.toString();
+      dest = tgtX.toString() + "," + tgtY.toString();
 
-
-      srcX = newSrcX * width/375.0;
-      srcY = newSrcY * height/375.0;
-      destX = newTgtX * width/375.0;
-      destY = newTgtY * height/375.0;
-
-      srcX_str = srcX.toString();
-      srcY_str = srcY.toString();
-      destX_str = destX.toString();
-      destY_str = destY.toString();
-      src = srcX_str.concat(",").concat(srcY_str);
-      dest = destX_str.concat(",").concat(destY_str);
       this.setState({routeStatus : "WAITING"});
 	  path_image = getImageWithPath(src, dest, this.state.building_name);
 	  path_image.then(response => {
