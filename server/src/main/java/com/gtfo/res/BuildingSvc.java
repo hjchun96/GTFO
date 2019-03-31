@@ -44,6 +44,7 @@ public class BuildingSvc {
 
     public byte[] getFloorplanImageFromS3(String name) throws IOException {
         String key = "floorplans/" + name + ".png";
+        System.out.println(name);
         S3Object obj = s3client.getObject("gtfo", key);
         byte[] res = IOUtils.toByteArray(obj.getObjectContent());
         return res;
@@ -104,7 +105,7 @@ public class BuildingSvc {
     public String fetchAllBuildings() {
         return StreamSupport.stream(buildingCollection.find().spliterator(), false)
                 .map(Document::toJson)
-                .collect(Collectors.joining(", ", "{", "}"));
+                .collect(Collectors.joining(", ", "[", "]"));
     }
 
     public String fetchBuildingOnPrefix(int limit, String prefix) {

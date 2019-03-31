@@ -14,7 +14,8 @@ import {
 } from 'react-native';
 import { Icon, Header } from 'react-native-elements'
 import { Ionicons } from '@expo/vector-icons';
-import { getUserBuildings } from "../fetch/FetchWrapper";
+import { getAllBuildings } from "../fetch/FetchWrapper";
+import { Location, Permissions, Constants } from 'expo';
 import logo1 from '../assets/images/logo1.png';
 
 export default class HomeScreen extends React.Component {
@@ -22,13 +23,25 @@ export default class HomeScreen extends React.Component {
     header: null,
   };
 
-  render() {
-    // TODO: fetch buildings and display here
-    // also get user email (from redux)
-    let buildings = getUserBuildings('test');
-    for (let i = 0; i < buildings.length; i++) {
-      buildings[i].key = buildings[i].name;
+  componentWillMount() {
+    if (Platform.OS === 'android' && !Constants.isDevice) {
+      this.setState({
+        errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
+      });
+    } else {
+      this._getLocationAsync().then(() => this._getClosestBuildings());
     }
+  }
+
+  state = {
+    coords: null,
+    closestBuildings: []
+  }
+
+  render() {
+    const { closestBuildings } = this.state;
+    if (closestBuildings.length == 0) { return null }
+
     return (
       <View style={styles.container}>
         <Header
@@ -39,7 +52,7 @@ export default class HomeScreen extends React.Component {
         />
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           <FlatList
-            data={buildings}
+            data={closestBuildings}
             renderItem={({item}) =>
               <Button 
                 style={styles.item}
@@ -63,8 +76,52 @@ export default class HomeScreen extends React.Component {
     this.props.navigation.navigate("AddBuilding");
   }
 
+  _getLocationAsync = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      this.setState({
+        errorMessage: 'Permission to access location was denied',
+      });
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    this.setState({ "coords": location.coords });
+
+    return Promise.resolve(1);
+  }
+
   _handleBuildingPressed = (building_name) => {
     this.props.navigation.navigate("Building", {building_name: building_name});
+  }
+
+  _getClosestBuildings = async () => {
+    var buildings = await getAllBuildings();
+    var closestBuildings = [];
+
+    var myLat = this.state.coords.latitude;
+    var myLon = this.state.coords.longitude;
+
+    for (var i = 0; i < buildings.length; i++) {
+      var name = buildings[i].name;
+      var lat = parseFloat(buildings[i].lat);
+      var lon = parseFloat(buildings[i].lon); 
+
+      if (Math.abs(lat - myLat) <= .01 && Math.abs(lon - myLon) <= .01) {
+        distance = Math.pow(Math.abs(lat - myLat), 2) + Math.pow(Math.abs(lon - myLon), 2);
+        closestBuildings.push({name, distance});
+      }
+    }
+
+    closestBuildings.sort((ele1, ele2) => {
+        return ele1.distance > ele2.distance;
+    })
+
+    var res = [];
+    for (var i = 0; i < closestBuildings.length; i++) {
+      res.push({key: closestBuildings[i].name});
+    }
+
+    this.setState({ closestBuildings: res })
   }
 
 }
@@ -75,7 +132,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   contentContainer: {
+    flex: 1,
     paddingTop: 30,
+    paddingVertical: 10,
     alignItems: 'center',
   },
   welcomeContainer: {
@@ -123,10 +182,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(247,247,247,1.0)',
   },
   item: {
-    paddingTop: 10,
-    paddingLeft: 10,
-    paddingBottom: 10,
-    paddingRight: 10,
+    padding: 10,
+    marginBottom: 15,
     fontSize: 30,
     height: 44,
     fontFamily: "Roboto",
