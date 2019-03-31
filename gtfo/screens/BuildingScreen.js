@@ -24,35 +24,46 @@ import PinchZoomView from 'react-native-pinch-zoom-view';
 import { getImageWithPath } from "../fetch/FetchWrapper";
 import picture from '../assets/images/houston.png'
 export default class BuildingScreen extends React.Component {
-  //
+  
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.getParam('building_name', 'undefined'),
     };
   }
+
+  componentDidMount = () => {
+  	let image_string = this.props.navigation.getParam('img', '')
+  	this.setState({ 
+  		rendered_image: {uri: image_string },
+  		loading: false,
+  	});
+  }
+
   state = {
     viewDirections: false,
-    rendered_image: require('../assets/images/houston.png'),
+    rendered_image: '',
     building_name: '',
 		startXCoord: -1,
 		startYCoord: -1,
 		endXCoord: -1,
 		endYCoord: -1,
 		routeStatus: "START",
+	loading: true,
   }
 
   render() {
 
+  		if (this.state.loading) {
+  			console.log("Hits here")
+  			return null;
+  		}
+
 		let routeStatus = this.state.routeStatus;
-		console.log("route staus: " + this.state.routeStatus);
-		console.log("equality" + (this.state.routeStatus === "END"));
 		let button, startMarker, endMarker;
-		console.log("re-rendering");
+
 		if (routeStatus === "START" || routeStatus === "WAITING_FOR_ENDPOINT") {
-			console.log("got in here for some reason");
 			button = <View></View>
 		} else if (routeStatus === "END") {
-			console.log("getting in here yo");
 			button = <Button
 					title="Get directions"
 					onPress={() => this._handleSetEnd()}
@@ -109,39 +120,21 @@ export default class BuildingScreen extends React.Component {
 
 		_handleSetEnd = async () => {
       const {width, height} = Image.resolveAssetSource(picture);
-      console.log("width: " + width);
-      console.log("height: " + height);
 
-						newSrcX = this.state.startXCoord;
-						newSrcY = this.state.startYCoord;
-						newTgtX = this.state.endXCoord;
-						newTgtY = this.state.endYCoord;
+			srcX = this.state.startXCoord * width / 375.0;
+			srcY = (this.state.startYCoord - 43) * height / 288;
+			tgtX = this.state.endXCoord * width / 375.0;
+			tgtY = (this.state.endYCoord - 43) * height / 288;
 
+      src = srcX.toString() + "," + srcY.toString();
+      dest = tgtX.toString() + "," + tgtY.toString();
 
-      console.log("new srcX: " + newSrcX);
-      console.log("new srcY: " + newSrcY);
-      console.log("new destX: " + newTgtX);
-      console.log("new destY: " + newTgtY);
-
-
-      srcX = newSrcX * width/375.0;
-      srcY = newSrcY * height/375.0;
-      destX = newTgtX * width/375.0;
-      destY = newTgtY * height/375.0;
-
-      srcX_str = srcX.toString();
-      srcY_str = srcY.toString();
-      destX_str = destX.toString();
-      destY_str = destY.toString();
-      src = srcX_str.concat(",").concat(srcY_str);
-      dest = destX_str.concat(",").concat(destY_str);
       this.setState({routeStatus : "WAITING"});
 	  path_image = getImageWithPath(src, dest, this.state.building_name);
 	  path_image.then(response => {
 	  	return response.json();
   	  }).then(json => {
-						console.log("error");
-  	  	console.log(json.err);
+  	  	
   	  	if(json.err) {
   	  		Alert.alert("Invalid Start / End location selected", json.err[0]);
   	  		this._handleStartOver();
@@ -160,14 +153,15 @@ export default class BuildingScreen extends React.Component {
   }
 
   _handleStartOver = async () => {
-				this.setState({
-					startXCoord: -1,
-					startYCoord: -1,
-					endXCoord: -1,
-					endYCoord: -1,
-					routeStatus: "START",
-					rendered_image: require('../assets/images/houston.png')
-				});
+  		let image_string = this.props.navigation.getParam('img', '')
+		this.setState({
+			startXCoord: -1,
+			startYCoord: -1,
+			endXCoord: -1,
+			endYCoord: -1,
+			routeStatus: "START",
+			rendered_image: {uri: image_string},
+		});
   }
 
 		_handlePress = async (evt) => {

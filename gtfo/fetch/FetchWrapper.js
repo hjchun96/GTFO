@@ -80,6 +80,16 @@ export function createBuilding(name, image, latitude, longitude) {
   }).then(response => console.log(response));
 }
 
+export function getImage(building) {
+  let url = api + "building/image/floorplan/" + building;
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  });
+}
+
 export function getImageWithPath(src, dst, building) {
   let url = api + 'building/imagePath/' + building + '/' + src + '/' + dst;
   console.log("url: " + url);
