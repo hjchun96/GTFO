@@ -134,8 +134,7 @@ export default class BuildingScreen extends React.Component {
 	  path_image.then(response => {
 	  	return response.json();
   	  }).then(json => {
-						console.log("error");
-  	  	console.log(json.err);
+  	  	
   	  	if(json.err) {
   	  		Alert.alert("Invalid Start / End location selected", json.err[0]);
   	  		this._handleStartOver();
@@ -154,14 +153,15 @@ export default class BuildingScreen extends React.Component {
   }
 
   _handleStartOver = async () => {
-				this.setState({
-					startXCoord: -1,
-					startYCoord: -1,
-					endXCoord: -1,
-					endYCoord: -1,
-					routeStatus: "START",
-					rendered_image: this.state.rendered_image,
-				});
+  		let image_string = this.props.navigation.getParam('img', '')
+		this.setState({
+			startXCoord: -1,
+			startYCoord: -1,
+			endXCoord: -1,
+			endYCoord: -1,
+			routeStatus: "START",
+			rendered_image: {uri: image_string},
+		});
   }
 
 		_handlePress = async (evt) => {
