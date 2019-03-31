@@ -178,14 +178,13 @@ export default class BuildingScreen extends React.Component {
     }
 
     _handleStartOver = async () => {
-      let image_string = this.props.navigation.getParam('img', '')
       this.setState({
         startXCoord: -1,
         startYCoord: -1,
         endXCoord: -1,
         endYCoord: -1,
         routeStatus: "START",
-        rendered_image: {uri: image_string},
+        rendered_image: this.state.rendered_image,
       });
     }
 
