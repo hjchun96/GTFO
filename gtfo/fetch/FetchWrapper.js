@@ -77,7 +77,7 @@ export function createBuilding(name, image, latitude, longitude) {
       lat: latitude,
       lon: longitude,
     })
-  }).then(response => console.log(response));
+  })
 }
 
 export function getImage(building) {

@@ -34,7 +34,7 @@ public class BuildingResource {
         String lon = json.getString("lon");
         buildingSvc.addFloorplan(floorplanName, img, "floorplans", lat, lon);
         buildingSvc.extractWalls(floorplanName);
-        // ADD FLASK SERVER CALL
+        System.out.println("Finished creating building");
         return Response.ok().build();
     }
 

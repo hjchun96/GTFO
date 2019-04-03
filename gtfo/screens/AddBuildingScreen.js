@@ -15,7 +15,7 @@ import {
   FormInput
 } from "react-native-elements";
 // import RNFS from 'react-native-fs';
-import { checkBuilding, createBuilding } from "../fetch/FetchWrapper";
+import { checkBuilding, createBuilding, getImage } from "../fetch/FetchWrapper";
 import KeyboardShift from '../components/KeyboardShift';
 
 export default class AddBuildingScreen extends React.Component {
@@ -127,20 +127,30 @@ export default class AddBuildingScreen extends React.Component {
         } else {
           return AsyncStorage.getItem('userToken');
         }
-      })
-      .then(user => {
+      }).then(user => {
         if (user) {
-          createBuilding(this.state.name, this.state.photo.base64,
+          return createBuilding(this.state.name, this.state.photo.base64,
             this.state.longitude, this.state.latitude)
-            return user;
         } else {
           return null;
         }
-      })
-      .then(success => {
+      }).then(success => {
+        // TODO: timing out
         if (success) {
-          this.props.navigation.navigate('Building', {building_name: this.state.name});
+          return getImage(this.state.name)
         }
+      }).then(resp => resp.json())
+        .then(json => {
+          if (json.err) {
+            console.log("Error fetching image");
+            Alert.alert("Could not find floorplan image");
+          } else {
+            var image_string = 'data:image/png;base64,'+json.img[0];
+            this.props.navigation.navigate("Building", {
+              building_name: this.state.name,
+              img: image_string,
+            });
+          }
       });
   }
 

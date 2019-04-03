@@ -41,19 +41,6 @@ export default class HomeScreen extends React.Component {
 
   render() {
     const { closestBuildings } = this.state;
-    if (closestBuildings.length == 0) { 
-      console.log("Loading closest buildings")
-      return (
-        <View style={styles.container}>
-          <Header
-              placement="left"
-              containerStyle={styles.welcomeContainer}
-              backgroundColor="#0079C6"
-              centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
-        />
-        </View>
-      )
-    }
 
     return (
       <View style={styles.container}>
@@ -64,16 +51,17 @@ export default class HomeScreen extends React.Component {
               centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
         />
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <FlatList
+          {closestBuildings.length != 0 &&
+          (<FlatList
             data={closestBuildings}
             renderItem={({item}) =>
-              <Button 
+              <Button
                 style={styles.item}
                 title={item.key}
                 textStyle={{ color: "#0079C6" }}
                 onPress={() => this._handleBuildingPressed(item.key)}
               />}
-          />
+          />)}
         </ScrollView>
         <Button
           buttonStyle={styles.addBuildingButton}
@@ -133,7 +121,7 @@ export default class HomeScreen extends React.Component {
     for (var i = 0; i < buildings.length; i++) {
       var name = buildings[i].name;
       var lat = parseFloat(buildings[i].lat);
-      var lon = parseFloat(buildings[i].lon); 
+      var lon = parseFloat(buildings[i].lon);
 
       if (Math.abs(lat - myLat) <= .01 && Math.abs(lon - myLon) <= .01) {
         distance = Math.pow(Math.abs(lat - myLat), 2) + Math.pow(Math.abs(lon - myLon), 2);
