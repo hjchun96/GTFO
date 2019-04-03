@@ -33,7 +33,7 @@ public class BuildingResource {
         String lat = json.getString("lat");
         String lon = json.getString("lon");
         buildingSvc.addFloorplan(floorplanName, img, "floorplans", lat, lon);
-
+        buildingSvc.extractWalls(floorplanName);
         // ADD FLASK SERVER CALL
         return Response.ok().build();
     }

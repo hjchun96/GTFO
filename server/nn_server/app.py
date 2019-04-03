@@ -1,8 +1,10 @@
 from flask import Flask
 from flask import request
+from flask import jsonify
 from main import feed_image_to_net
 from flask_cors import CORS, cross_origin
 from PIL import Image
+from base64 import b64encode
 app = Flask(__name__)
 CORS(app)
 
@@ -44,17 +46,24 @@ def name_to_image(name):
     # return the image
     return image
 
-
 @app.route('/detect_walls', methods=["GET", "POST"])
 def detect_walls():
-    #image = url_to_image(request.args.get('image_url'))
     image = name_to_image(request.args.get('image_name'))
 
     image_result = feed_image_to_net(image)
     result = image_result
     #result = Image.fromarray(((1 - image_result) * 255).astype(np.uint8))
-    result.save('nn_output/output.png')
+    result.save('static/output.png')
+    print("Completed")
     return "Completed"
+
+@app.route('/static/output.png', methods=["GET"])
+def get_output():
+    with open('./static/output.png', 'r') as f:
+        s = f.read()
+    encoding = b64encode(s)
+    print(encoding)
+    return encoding
 
 @app.route('/')
 def hello():
