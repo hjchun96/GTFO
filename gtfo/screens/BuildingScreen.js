@@ -20,6 +20,7 @@ import {
   TextInput
 } from 'react-native';
 import PinchZoomView from 'react-native-pinch-zoom-view';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import { getImageWithPath, getNNImage } from "../fetch/FetchWrapper";
 import picture from '../assets/images/houston.png'
@@ -102,8 +103,12 @@ export default class BuildingScreen extends React.Component {
       <PinchZoomView minScale = {1.0} maxScale = {4.0}>
       <TouchableWithoutFeedback onPress={(evt) => this._handlePress(evt) } >
       <View style={styles.container}>
-
       <View style={styles.contentContainer}>
+        <Spinner
+          visible={this.state.routeStatus === "WAITING"}
+          textContent={'Loading route...'}
+          textStyle={styles.spinnerTextStyle}
+        />
       <ImageBackground
       resizeMode="contain"
       source = {this.state.switch1Value ? this.state.nn_image : this.state.rendered_image}
@@ -264,5 +269,8 @@ export default class BuildingScreen extends React.Component {
       resizeMode: 'contain',
       // alignItems: 'flex-end',
       backgroundColor: 'transparent'
-    }
+    },
+    spinnerTextStyle: {
+      color: '#FFF'
+    },
   });

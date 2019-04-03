@@ -17,6 +17,7 @@ import {
 // import RNFS from 'react-native-fs';
 import { checkBuilding, createBuilding, getImage } from "../fetch/FetchWrapper";
 import KeyboardShift from '../components/KeyboardShift';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class AddBuildingScreen extends React.Component {
   static navigationOptions = {
@@ -28,6 +29,7 @@ export default class AddBuildingScreen extends React.Component {
     longitude: '',
     latitude: '',
     photo: null,
+    spinner: false,
   }
 
   render() {
@@ -35,6 +37,11 @@ export default class AddBuildingScreen extends React.Component {
       <KeyboardShift>
         {() => (
         <ScrollView style={{ paddingVertical: 20, marginBottom: 20 }}>
+          <Spinner
+            visible={this.state.spinner}
+            textContent={'Loading...'}
+            textStyle={styles.spinnerTextStyle}
+          />
           <Card>
             <FormLabel>Building Name</FormLabel>
             <FormInput
@@ -109,13 +116,17 @@ export default class AddBuildingScreen extends React.Component {
   }
 
   _addBuilding = async () => {
+    this.setState({spinner: true}, () => { this.setState({spinner: true}) });
+    console.log("here");
     if (!this.state.name || !this.state.photo) {
       alert("Please fill out all fields and choose a floorplan image.");
+      this.setState({spinner: false});
       return;
     }
 
     if (!this.state.longitude || !this.state.latitude) {
-      alert("Please input the coordinates for the building")
+      alert("Please input the coordinates for the building");
+      this.setState({spinner: false});
       return;
     }
 
@@ -135,12 +146,12 @@ export default class AddBuildingScreen extends React.Component {
           return null;
         }
       }).then(success => {
-        // TODO: timing out
         if (success) {
           return getImage(this.state.name)
         }
       }).then(resp => resp.json())
         .then(json => {
+          this.setState({spinner: false});
           if (json.err) {
             console.log("Error fetching image");
             Alert.alert("Could not find floorplan image");
@@ -152,6 +163,7 @@ export default class AddBuildingScreen extends React.Component {
             });
           }
       });
+      this.setState({spinner: false});
   }
 
 }
@@ -167,3 +179,9 @@ function stringToUint8Array(str) {
   }
   return array;
 }
+
+const styles = StyleSheet.create({
+  spinnerTextStyle: {
+    color: '#FFF'
+  },
+});

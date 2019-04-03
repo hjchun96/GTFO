@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { getAllBuildings, getImage } from "../fetch/FetchWrapper";
 import { Location, Permissions, Constants } from 'expo';
 import logo1 from '../assets/images/logo1.png';
+import PTRView from 'react-native-pull-to-refresh';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
