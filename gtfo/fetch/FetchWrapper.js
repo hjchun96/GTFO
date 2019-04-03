@@ -90,6 +90,16 @@ export function getImage(building) {
   });
 }
 
+export function getNNImage(building) {
+  let url = api + "building/image/nn/" + building;
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  });
+}
+
 export function getImageWithPath(src, dst, building) {
   let url = api + 'building/imagePath/' + building + '/' + src + '/' + dst;
   console.log("url: " + url);

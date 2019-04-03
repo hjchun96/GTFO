@@ -180,13 +180,25 @@ public class BuildingSvc {
             JSONObject res = new JSONObject();
             res.append("img", Base64.encodeBase64String(os.toByteArray()));
             return res.toString();
-        } catch(IllegalArgumentException e) {
+        } catch(IllegalArgumentException|AmazonServiceException e) {
             JSONObject res = new JSONObject();
             res.append("err", e.getMessage());
             return res.toString();
-        } catch (AmazonServiceException s3e) {
+        }
+    }
+
+    public String getNNImage(String buildingId) throws IOException, JSONException {
+        try {
+            BufferedImage floorplan = createImageFromBytes(getNeuralNetImageFromS3(buildingId));
+
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(floorplan, "png", os);
             JSONObject res = new JSONObject();
-            res.append("err", s3e.getMessage());
+            res.append("img", Base64.encodeBase64String(os.toByteArray()));
+            return res.toString();
+        } catch(IllegalArgumentException|AmazonServiceException e) {
+            JSONObject res = new JSONObject();
+            res.append("err", e.getMessage());
             return res.toString();
         }
     }
