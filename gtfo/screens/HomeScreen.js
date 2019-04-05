@@ -63,25 +63,27 @@ export default class HomeScreen extends React.Component {
           containerStyle={styles.welcomeContainer}
           backgroundColor="#0079C6"
           centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
-          leftComponent={{ icon: 'menu', color: '#fff' }}
         />
+        <Text style={styles.text}>
+          Closest Buildings
+        </Text>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           {closestBuildings.length != 0 &&
           (<FlatList style={{ backgroundColor:"#fff"}}
             data={closestBuildings}
             renderItem={({item}) =>
               <Button
-                style={styles.item}
+                buttonStyle={styles.listitem}
                 title={item.key}
-                icon={{name: 'building', type: 'font-awesome'}}
-                textStyle={{ color: "#000000" }}
+                // icon={{name: 'building', type: 'font-awesome'}}
+                textStyle={{ color: "#fff" }}
                 onPress={() => this._handleBuildingPressed(item.key)}
-                color='#fff'
               />}
           />)}
         </ScrollView>
         <Button
           small
+          buttonStyle={styles.item}
           icon={{name: 'plus', type: 'font-awesome'}}
           title='Add a Building'
           onPress={() => this._handleAddBuildingButtonPressed()}
@@ -173,6 +175,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     // alignItems: 'center',
     alignItems: 'stretch',
+    marginLeft: 60,
+    marginRight: 60,
   },
   welcomeContainer: {
     alignItems: 'center',
@@ -240,10 +244,19 @@ const styles = StyleSheet.create({
   //   fontWeight: 'bold',
   //   backgroundColor: 'rgba(247,247,247,1.0)',
   // },
+  listitem: {
+    backgroundColor: "#0079C6",
+    borderWidth: 3.0,
+    borderColor: '#000000',
+    marginVertical: 2,
+  },
+
   item: {
-    backgroundColor: "#ffffff",
-    borderBottomWidth: 1.0,
-    borderColor: '#c9c9c9',
+    backgroundColor: "#0079C6",
+    borderWidth: 3.0,
+    borderColor: '#000000',
+    marginVertical: 5,
+
     // padding: 10,
     // marginBottom: 15,
     // fontSize: 30,
@@ -264,6 +277,12 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: "#0079C6",
 
+  },
+  text: {
+    textAlign: 'center',
+    paddingTop: 10,
+    fontWeight: "800",
+    fontSize: 24,
   },
   loading: {
     backgroundColor: "#0079C6",
