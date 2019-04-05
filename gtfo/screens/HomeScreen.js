@@ -44,7 +44,7 @@ export default class HomeScreen extends React.Component {
 
   render() {
     const { closestBuildings } = this.state;
-    if (closestBuildings.length == 0) { 
+    if (closestBuildings.length == 0) {
       console.log("Loading closest buildings")
       return (
         <View style={styles.loading}>
@@ -185,8 +185,8 @@ const styles = StyleSheet.create({
   welcomeImage: {
     maxWidth: 110,
     maxHeight: 50,
-    // width: auto,
-    // height: auto,
+    marginTop: 200,
+    marginVertical: -10,
     resizeMode: 'contain',
   },
   homeScreenFilename: {

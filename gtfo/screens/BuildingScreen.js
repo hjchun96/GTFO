@@ -60,7 +60,6 @@ export default class BuildingScreen extends React.Component {
   }
 
   render() {
-    console.log(this.state.routeStatus);
     if (this.state.loading) {
       console.log("Hits here")
       return null;
