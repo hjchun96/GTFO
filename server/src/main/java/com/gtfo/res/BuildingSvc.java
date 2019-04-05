@@ -3,7 +3,6 @@ package com.gtfo.res;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import com.gtfo.app.FloorGraph;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -21,11 +20,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class BuildingSvc {
+
+    static final String FLASK_SERVER_IP = "http://18.205.22.50";
 
     public MongoConnection mongoConnection;
     public MongoDatabase mongoDatabase;
@@ -66,8 +69,50 @@ public class BuildingSvc {
         }
     }
 
-    public void addFloorplan(String name, String img, String type, String lat, String lon) {
-        byte[] imageByteArray = Base64.decodeBase64(img);
+    /**
+     * Makes a request to flask server to extract walls. Once complete,
+     * the resulting image is then polled from the flask server, and added to S3
+     * @param floorplanName
+     */
+    public void extractWalls(String floorplanName) {
+        floorplanName = floorplanName.replaceAll("\\s", "");
+        String url = FLASK_SERVER_IP + "/detect_walls?image_name=" + floorplanName;
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setConnectTimeout(10000);
+            connection.setRequestMethod("POST");
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                System.out.println("Error accessing flask server " + responseCode);
+                return;
+            }
+
+            HttpURLConnection outputConnection = (HttpURLConnection) new URL(FLASK_SERVER_IP
+                                                    + "/static/output.png").openConnection();
+            outputConnection.setConnectTimeout(10000);
+            outputConnection.setRequestMethod("GET");
+            responseCode = outputConnection.getResponseCode();
+            if (responseCode != 200) {
+                System.out.println("Error accessing flask server output " + responseCode);
+                return;
+            }
+
+            StringBuilder response = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(outputConnection.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+
+            byte[] imageByteArray = Base64.decodeBase64(response.toString());
+            addFloorplan(floorplanName, imageByteArray, "neural_net");
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private void addFloorplan(String name, byte[] imageByteArray, String type) {
         String extension = "png";
         String imgName = type + "/" + name + "." + extension;
         try {
@@ -79,6 +124,11 @@ public class BuildingSvc {
         } catch (AmazonServiceException e) {
             System.err.println(e.getErrorMessage());
         }
+    }
+
+    public void addFloorplan(String name, String img, String type, String lat, String lon) {
+        byte[] imageByteArray = Base64.decodeBase64(img);
+        addFloorplan(name, imageByteArray, type);
         Document building = new Document("name", name);
         building.append("s3_url", name);
         building.append("lat", lat);
@@ -119,6 +169,38 @@ public class BuildingSvc {
         return StreamSupport.stream(buildingCollection.find(findQuery).limit(limit).spliterator(), false)
                 .map(Document::toJson)
                 .collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    public String getFloorplanImage(String buildingId) throws IOException, JSONException {
+        try {
+            BufferedImage floorplan = createImageFromBytes(getFloorplanImageFromS3(buildingId));
+            
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(floorplan, "png", os);
+            JSONObject res = new JSONObject();
+            res.append("img", Base64.encodeBase64String(os.toByteArray()));
+            return res.toString();
+        } catch(IllegalArgumentException|AmazonServiceException e) {
+            JSONObject res = new JSONObject();
+            res.append("err", e.getMessage());
+            return res.toString();
+        }
+    }
+
+    public String getNNImage(String buildingId) throws IOException, JSONException {
+        try {
+            BufferedImage floorplan = createImageFromBytes(getNeuralNetImageFromS3(buildingId));
+
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(floorplan, "png", os);
+            JSONObject res = new JSONObject();
+            res.append("img", Base64.encodeBase64String(os.toByteArray()));
+            return res.toString();
+        } catch(IllegalArgumentException|AmazonServiceException e) {
+            JSONObject res = new JSONObject();
+            res.append("err", e.getMessage());
+            return res.toString();
+        }
     }
 
     /**

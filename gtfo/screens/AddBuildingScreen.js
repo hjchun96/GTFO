@@ -15,8 +15,9 @@ import {
   FormInput
 } from "react-native-elements";
 // import RNFS from 'react-native-fs';
-import { checkBuilding, createBuilding } from "../fetch/FetchWrapper";
+import { checkBuilding, createBuilding, getImage } from "../fetch/FetchWrapper";
 import KeyboardShift from '../components/KeyboardShift';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class AddBuildingScreen extends React.Component {
   static navigationOptions = {
@@ -28,6 +29,7 @@ export default class AddBuildingScreen extends React.Component {
     longitude: '',
     latitude: '',
     photo: null,
+    spinner: false,
   }
 
   render() {
@@ -35,6 +37,11 @@ export default class AddBuildingScreen extends React.Component {
       <KeyboardShift>
         {() => (
         <ScrollView style={{ paddingVertical: 20, marginBottom: 20 }}>
+          <Spinner
+            visible={this.state.spinner}
+            textContent={'Loading...'}
+            textStyle={styles.spinnerTextStyle}
+          />
           <Card>
             <FormLabel>Building Name</FormLabel>
             <FormInput
@@ -109,13 +116,17 @@ export default class AddBuildingScreen extends React.Component {
   }
 
   _addBuilding = async () => {
+    this.setState({spinner: true}, () => { this.setState({spinner: true}) });
+    console.log("here");
     if (!this.state.name || !this.state.photo) {
       alert("Please fill out all fields and choose a floorplan image.");
+      this.setState({spinner: false});
       return;
     }
 
     if (!this.state.longitude || !this.state.latitude) {
-      alert("Please input the coordinates for the building")
+      alert("Please input the coordinates for the building");
+      this.setState({spinner: false});
       return;
     }
 
@@ -127,21 +138,32 @@ export default class AddBuildingScreen extends React.Component {
         } else {
           return AsyncStorage.getItem('userToken');
         }
-      })
-      .then(user => {
+      }).then(user => {
         if (user) {
-          createBuilding(this.state.name, this.state.photo.base64,
+          return createBuilding(this.state.name, this.state.photo.base64,
             this.state.longitude, this.state.latitude)
-            return user;
         } else {
           return null;
         }
-      })
-      .then(success => {
+      }).then(success => {
         if (success) {
-          this.props.navigation.navigate('Building', {building_name: this.state.name});
+          return getImage(this.state.name)
         }
+      }).then(resp => resp.json())
+        .then(json => {
+          this.setState({spinner: false});
+          if (json.err) {
+            console.log("Error fetching image");
+            Alert.alert("Could not find floorplan image");
+          } else {
+            var image_string = 'data:image/png;base64,'+json.img[0];
+            this.props.navigation.navigate("Building", {
+              building_name: this.state.name,
+              img: image_string,
+            });
+          }
       });
+      this.setState({spinner: false});
   }
 
 }
@@ -157,3 +179,9 @@ function stringToUint8Array(str) {
   }
   return array;
 }
+
+const styles = StyleSheet.create({
+  spinnerTextStyle: {
+    color: '#FFF'
+  },
+});

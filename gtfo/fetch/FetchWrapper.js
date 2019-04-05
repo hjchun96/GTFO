@@ -77,7 +77,27 @@ export function createBuilding(name, image, latitude, longitude) {
       lat: latitude,
       lon: longitude,
     })
-  }).then(response => console.log(response));
+  })
+}
+
+export function getImage(building) {
+  let url = api + "building/image/floorplan/" + building;
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  });
+}
+
+export function getNNImage(building) {
+  let url = api + "building/image/nn/" + building;
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  });
 }
 
 export function getImageWithPath(src, dst, building) {

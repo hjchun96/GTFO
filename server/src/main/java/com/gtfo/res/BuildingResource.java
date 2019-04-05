@@ -33,8 +33,8 @@ public class BuildingResource {
         String lat = json.getString("lat");
         String lon = json.getString("lon");
         buildingSvc.addFloorplan(floorplanName, img, "floorplans", lat, lon);
-
-        // ADD FLASK SERVER CALL
+        buildingSvc.extractWalls(floorplanName);
+        System.out.println("Finished creating building");
         return Response.ok().build();
     }
 
@@ -59,6 +59,22 @@ public class BuildingResource {
     @Path("/prefixed/{limit}/{prefix}")
     public Response fetchBuildingOnPrefix(@PathParam("prefix") String prefix, @PathParam("limit") int limit) {
         String response = buildingSvc.fetchBuildingOnPrefix(limit, prefix);
+        return (response == null) ? Response.ok().build() : Response.ok().entity(response).build();
+    }
+
+    @GET
+    @Path("/image/floorplan/{building}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFloorplanImage( @PathParam("building") String building) throws IOException, JSONException {
+        String response = buildingSvc.getFloorplanImage(building);
+        return (response == null) ? Response.ok().build() : Response.ok().entity(response).build();
+    }
+
+    @GET
+    @Path("/image/nn/{building}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getNNImage( @PathParam("building") String building) throws IOException, JSONException {
+        String response = buildingSvc.getNNImage(building);
         return (response == null) ? Response.ok().build() : Response.ok().entity(response).build();
     }
 
