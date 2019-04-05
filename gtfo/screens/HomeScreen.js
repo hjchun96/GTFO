@@ -42,6 +42,14 @@ export default class HomeScreen extends React.Component {
 
   render() {
     const { closestBuildings } = this.state;
+    if (closestBuildings.length == 0) { 
+      console.log("Loading closest buildings")
+      return (
+        <View style={styles.loading}>
+          <Image source={logo1} style={styles.loadingImage} />
+        </View>
+      )
+    }
 
     return (
       <View style={styles.container}>
@@ -209,5 +217,16 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: "#0079C6",
 
-  }
+  },
+  loading: {
+    backgroundColor: "#0079C6",
+    alignItems: 'center',
+    flex: 1,
+  },
+  loadingImage: {
+    flex: 1,
+    width: 300,
+    height: 'auto',
+    resizeMode: 'contain',
+  },
 });
