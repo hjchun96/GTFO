@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
   welcomeImage: {
     maxWidth: 110,
     maxHeight: 50,
-    // width: auto,
-    // height: auto,
+    marginTop: 200,
+    marginVertical: -10,
     resizeMode: 'contain',
   },
   homeScreenFilename: {
