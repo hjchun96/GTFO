@@ -12,6 +12,7 @@ import {
   ListItem,
   AsyncStorage,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { Icon, Header } from 'react-native-elements'
 import { Ionicons } from '@expo/vector-icons';
@@ -37,11 +38,20 @@ export default class HomeScreen extends React.Component {
 
   state = {
     coords: null,
-    closestBuildings: []
+    closestBuildings: [],
+    refreshing: false
   }
 
   render() {
     const { closestBuildings } = this.state;
+    if (closestBuildings.length == 0) { 
+      console.log("Loading closest buildings")
+      return (
+        <View style={styles.loading}>
+          <Image source={logo1} style={styles.loadingImage} />
+        </View>
+      )
+    }
 
     return (
       <View style={styles.container}>
@@ -51,7 +61,14 @@ export default class HomeScreen extends React.Component {
               backgroundColor="#0079C6"
               centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
         />
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+
+
+
+        <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this._getLocationAsync().then(() => this._getClosestBuildings())}/>}
+        >
           {closestBuildings.length != 0 &&
           (<FlatList
             data={closestBuildings}
@@ -79,6 +96,7 @@ export default class HomeScreen extends React.Component {
   }
 
   _getLocationAsync = async () => {
+    this.setState({"refreshing":true});
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
       this.setState({
@@ -87,7 +105,8 @@ export default class HomeScreen extends React.Component {
     }
 
     let location = await Location.getCurrentPositionAsync({});
-    this.setState({ "coords": location.coords });
+    this.setState({ "coords": location.coords});
+    console.log("got the coords:" + JSON.stringify(location.coords));
 
     return Promise.resolve(1);
   }
@@ -119,10 +138,14 @@ export default class HomeScreen extends React.Component {
     var myLat = this.state.coords.latitude;
     var myLon = this.state.coords.longitude;
 
+    console.log("myLat: " + myLat + ", myLon: " + myLon)
+
     for (var i = 0; i < buildings.length; i++) {
       var name = buildings[i].name;
       var lat = parseFloat(buildings[i].lat);
       var lon = parseFloat(buildings[i].lon);
+
+      console.log("Building " + name + " lives on lat: " + lat + ", lon: " + lon);
 
       if (Math.abs(lat - myLat) <= .01 && Math.abs(lon - myLon) <= .01) {
         distance = Math.pow(Math.abs(lat - myLat), 2) + Math.pow(Math.abs(lon - myLon), 2);
@@ -138,8 +161,8 @@ export default class HomeScreen extends React.Component {
     for (var i = 0; i < closestBuildings.length; i++) {
       res.push({key: closestBuildings[i].name});
     }
-
-    this.setState({ closestBuildings: res })
+    console.log("set the closestBuildings, done refreshing.");
+    this.setState({ closestBuildings: res, "refreshing": false })
   }
 
 }
@@ -209,5 +232,16 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: "#0079C6",
 
-  }
+  },
+  loading: {
+    backgroundColor: "#0079C6",
+    alignItems: 'center',
+    flex: 1,
+  },
+  loadingImage: {
+    flex: 1,
+    width: 300,
+    height: 'auto',
+    resizeMode: 'contain',
+  },
 });
