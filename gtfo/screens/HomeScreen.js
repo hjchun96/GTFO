@@ -44,6 +44,14 @@ export default class HomeScreen extends React.Component {
 
   render() {
     const { closestBuildings } = this.state;
+    if (closestBuildings.length == 0) {
+      console.log("Loading closest buildings")
+      return (
+        <View style={styles.loading}>
+          <Image source={logo1} style={styles.loadingImage} />
+        </View>
+      )
+    }
 
     return (
       <View style={styles.container}>
@@ -52,10 +60,10 @@ export default class HomeScreen extends React.Component {
           containerStyle={{paddingBottom:100}}
         />
         <Header
-              containerStyle={styles.welcomeContainer}
-              backgroundColor="#0079C6"
-              centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
-              leftComponent={{ icon: 'menu', color: '#fff' }}
+          containerStyle={styles.welcomeContainer}
+          backgroundColor="#0079C6"
+          centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
+          leftComponent={{ icon: 'menu', color: '#fff' }}
         />
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           {closestBuildings.length != 0 &&
@@ -205,7 +213,7 @@ const styles = StyleSheet.create({
   // },
   addBuildingButton: {
     position: 'absolute',
-    // bottom: 0,
+    // bottom: 30,
     // left: 10,
     // right: 10,
     ...Platform.select({
@@ -253,14 +261,19 @@ const styles = StyleSheet.create({
     //   }),
     // fontFamily: "Roboto",
   },
-  // header: {
-  //   backgroundColor: "#0079C6",
-  // }  // <Icon
-    //   raised
-    //   name="plus"
-    //   size={50}
-    //   color="#0079C6"
-    //   stule={styles.addBuildingButton}
-    //   onPress={() => this._handleAddBuildingButtonPressed()}
-    // />
+  header: {
+    backgroundColor: "#0079C6",
+
+  },
+  loading: {
+    backgroundColor: "#0079C6",
+    alignItems: 'center',
+    flex: 1,
+  },
+  loadingImage: {
+    flex: 1,
+    width: 300,
+    height: 'auto',
+    resizeMode: 'contain',
+  },
 });

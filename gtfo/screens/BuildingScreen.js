@@ -30,6 +30,10 @@ export default class BuildingScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.getParam('building_name', 'undefined'),
+      headerStyle: {
+        backgroundColor: "#0079C6"
+      },
+      headerTintColor: "#fff"
     };
   }
 
@@ -212,7 +216,6 @@ export default class BuildingScreen extends React.Component {
         });
       }
       console.log("Registered click");
-
     }
 
     _getStartMarkerStyle = function() {

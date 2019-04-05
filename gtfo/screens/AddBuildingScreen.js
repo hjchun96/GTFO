@@ -20,8 +20,14 @@ import KeyboardShift from '../components/KeyboardShift';
 import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class AddBuildingScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Add a building',
+  static navigationOptions = ({navigation, navigationOptions}) => {
+    return {
+        title: 'Add a building',
+        headerStyle: {
+          backgroundColor: "#0079C6"
+        },
+        headerTintColor: "#fff",
+      };
   };
 
   state = {
@@ -36,7 +42,7 @@ export default class AddBuildingScreen extends React.Component {
     return (
       <KeyboardShift>
         {() => (
-        <ScrollView style={{ paddingVertical: 20, marginBottom: 20 }}>
+        <ScrollView style={{ paddingVertical: 70, marginBottom: 5 }}>
           <Spinner
             visible={this.state.spinner}
             textContent={'Loading...'}
