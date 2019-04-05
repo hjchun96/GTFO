@@ -6,17 +6,20 @@ import {
   StyleSheet,
   View,
   Text,
-  Button,
+  // Button,
   TouchableOpacity,
   FlatList,
   ListItem,
   AsyncStorage,
+  StatusBar
 } from 'react-native';
-import { Icon, Header } from 'react-native-elements'
+import { Header, Button } from 'react-native-elements'
 import { Ionicons } from '@expo/vector-icons';
 import { getAllBuildings } from "../fetch/FetchWrapper";
 import { Location, Permissions, Constants } from 'expo';
 import logo1 from '../assets/images/logo1.png';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -44,30 +47,36 @@ export default class HomeScreen extends React.Component {
 
     return (
       <View style={styles.container}>
+        <StatusBar
+          barStyle="light-content"
+          containerStyle={{paddingBottom:100}}
+        />
         <Header
-              placement="left"
               containerStyle={styles.welcomeContainer}
               backgroundColor="#0079C6"
               centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
+              leftComponent={{ icon: 'menu', color: '#fff' }}
         />
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <FlatList
+          <FlatList style={{ backgroundColor:"#fff"}}
             data={closestBuildings}
             renderItem={({item}) =>
-              <Button 
+              <Button
                 style={styles.item}
                 title={item.key}
-                textStyle={{ color: "#0079C6" }}
+                icon={{name: 'building', type: 'font-awesome'}}
+                textStyle={{ color: "#000000" }}
                 onPress={() => this._handleBuildingPressed(item.key)}
+                color='#fff'
               />}
           />
         </ScrollView>
         <Button
-          buttonStyle={styles.addBuildingButton}
-          title="Add a building"
-          textStyle={{ color: "#0079C6" }}
+          small
+          icon={{name: 'plus', type: 'font-awesome'}}
+          title='Add a Building'
           onPress={() => this._handleAddBuildingButtonPressed()}
-        />
+          />
       </View>
     );
   }
@@ -104,7 +113,7 @@ export default class HomeScreen extends React.Component {
     for (var i = 0; i < buildings.length; i++) {
       var name = buildings[i].name;
       var lat = parseFloat(buildings[i].lat);
-      var lon = parseFloat(buildings[i].lon); 
+      var lon = parseFloat(buildings[i].lon);
 
       if (Math.abs(lat - myLat) <= .01 && Math.abs(lon - myLon) <= .01) {
         distance = Math.pow(Math.abs(lat - myLat), 2) + Math.pow(Math.abs(lon - myLon), 2);
@@ -130,32 +139,58 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    // paddingTop:10,
   },
   contentContainer: {
+    backgroundColor: '#fff',
     flex: 1,
-    paddingTop: 30,
+    paddingTop: 20,
     paddingVertical: 10,
-    alignItems: 'center',
+    // alignItems: 'center',
+    alignItems: 'stretch',
   },
   welcomeContainer: {
     alignItems: 'center',
-    paddingTop: 40,
+    marginTop:30
+    // height: 200,
+    // paddingTop: 100,
   },
   welcomeImage: {
     maxWidth: 110,
-    maxHeight: 50,
+    maxHeight: 70,
     // width: auto,
     // height: auto,
-    resizeMode: 'contain',
+    // resizeMode: 'contain',
   },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
+  // homeScreenFilename: {
+  //   marginVertical: 7,
+  // },
+  // addBuildingButton: {
+  //   position: 'absolute',
+  //   bottom: 0,
+  //   left: 0,
+  //   right: 0,
+  //   ...Platform.select({
+  //     ios: {
+  //       shadowColor: 'black',
+  //       shadowOffset: { height: -3 },
+  //       shadowOpacity: 0.1,
+  //       shadowRadius: 3,
+  //     },
+  //     android: {
+  //       elevation: 20,
+  //     },
+  //   }),
+  //   alignItems: 'center',
+  //   backgroundColor: '#fff',
+  //   paddingVertical: 20,
+  //   paddingBottom: 20,
+  // },
   addBuildingButton: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    // bottom: 0,
+    // left: 10,
+    // right: 10,
     ...Platform.select({
       ios: {
         shadowColor: 'black',
@@ -168,28 +203,47 @@ const styles = StyleSheet.create({
       },
     }),
     alignItems: 'center',
-    backgroundColor: '#fbfbfb',
     paddingVertical: 20,
     paddingBottom: 20,
   },
-  sectionHeader: {
-    paddingTop: 2,
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 2,
-    fontSize: 14,
-    fontWeight: 'bold',
-    backgroundColor: 'rgba(247,247,247,1.0)',
-  },
+  // sectionHeader: {
+  //   paddingTop: 2,
+  //   paddingLeft: 10,
+  //   paddingRight: 10,
+  //   paddingBottom: 2,
+  //   fontSize: 14,
+  //   fontWeight: 'bold',
+  //   backgroundColor: 'rgba(247,247,247,1.0)',
+  // },
   item: {
-    padding: 10,
-    marginBottom: 15,
-    fontSize: 30,
-    height: 44,
-    fontFamily: "Roboto",
+    backgroundColor: "#ffffff",
+    borderBottomWidth: 1.0,
+    borderColor: '#c9c9c9',
+    // padding: 10,
+    // marginBottom: 15,
+    // fontSize: 30,
+    // height: 44,
+    // ...Platform.select({
+    //     ios: {
+    //       shadowColor: 'black',
+    //       shadowOffset: { height: -3 },
+    //       shadowOpacity: 0.1,
+    //       shadowRadius: 3,
+    //     },
+    //     android: {
+    //       elevation: 20,
+    //     },
+    //   }),
+    // fontFamily: "Roboto",
   },
-  header: {
-    backgroundColor: "#0079C6",
-
-  }
+  // header: {
+  //   backgroundColor: "#0079C6",
+  // }  // <Icon
+    //   raised
+    //   name="plus"
+    //   size={50}
+    //   color="#0079C6"
+    //   stule={styles.addBuildingButton}
+    //   onPress={() => this._handleAddBuildingButtonPressed()}
+    // />
 });
