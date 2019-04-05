@@ -44,7 +44,7 @@ export default class HomeScreen extends React.Component {
 
   render() {
     const { closestBuildings } = this.state;
-    if (closestBuildings.length == 0) { 
+    if (closestBuildings.length == 0) {
       console.log("Loading closest buildings")
       return (
         <View style={styles.loading}>
@@ -111,7 +111,7 @@ export default class HomeScreen extends React.Component {
     return Promise.resolve(1);
   }
 
-  _handleBuildingPressed = (building_name) => {
+  _retrieveBuildingImg = (building_name) => {
     if (building_name != '') {
       // Call endpoint
       var image = getImage(building_name);
@@ -122,13 +122,17 @@ export default class HomeScreen extends React.Component {
             Alert.alert("Could not find floorplan image");
           } else {
             var image_string = 'data:image/png;base64,'+json.img[0];
-            this.props.navigation.navigate("Building", {
-              building_name: building_name,
-              img: image_string,
-            });
+            this.setState({[building_name]: image_string})
           }
         })
     }
+  }
+
+  _handleBuildingPressed = (building_name) => {
+    this.props.navigation.navigate("Building", {
+      building_name: building_name,
+      img: this.state[building_name],
+    });
   }
 
   _getClosestBuildings = async () => {
@@ -150,6 +154,7 @@ export default class HomeScreen extends React.Component {
       if (Math.abs(lat - myLat) <= .01 && Math.abs(lon - myLon) <= .01) {
         distance = Math.pow(Math.abs(lat - myLat), 2) + Math.pow(Math.abs(lon - myLon), 2);
         closestBuildings.push({name, distance});
+        this._retrieveBuildingImg(name);
       }
     }
 
@@ -160,6 +165,7 @@ export default class HomeScreen extends React.Component {
     var res = [];
     for (var i = 0; i < closestBuildings.length; i++) {
       res.push({key: closestBuildings[i].name});
+
     }
     console.log("set the closestBuildings, done refreshing.");
     this.setState({ closestBuildings: res, "refreshing": false })
