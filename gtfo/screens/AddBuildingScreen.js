@@ -182,13 +182,8 @@ export default class AddBuildingScreen extends React.Component {
         }
       }).then(success => {
         if (success) {
+          console.log(success);
           return getImage(this.state.name);
-        }
-      }).then(resp => {
-        if (resp) {
-          return resp.json();
-        } else {
-          return null;
         }
       }).then(json => {
         if (json) {
