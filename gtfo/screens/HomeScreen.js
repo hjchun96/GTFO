@@ -78,7 +78,7 @@ export default class HomeScreen extends React.Component {
               <ListItem
                 key={i}
                 leftIcon={building.icon ? 
-                    <Image style={{width: 30, height: 30, resizeMode: 'contain'}} 
+                    <Image style={{width: 30, height: 30, resizeMode: 'contain', marginRight: 5}} 
                         source={{uri: building.icon}} >
                     </Image>
                   : {
