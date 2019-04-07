@@ -95,13 +95,13 @@ export default class HomeScreen extends React.Component {
   _getDistance = (lat1, lon1, lat2, lon2) => {
     var R = 6371; // Radius of the earth in km
     var dLat = this._degreeToRadius(lat2-lat1);  // deg2rad below
-    var dLon = this._degreeToRadius(lon2-lon1); 
-    var a = 
+    var dLon = this._degreeToRadius(lon2-lon1);
+    var a =
       Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(this._degreeToRadius(lat1)) * Math.cos(this._degreeToRadius(lat2)) * 
+      Math.cos(this._degreeToRadius(lat1)) * Math.cos(this._degreeToRadius(lat2)) *
       Math.sin(dLon/2) * Math.sin(dLon/2)
-      ; 
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+      ;
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     var d = R * c; // Distance in km
     return d;
   }
@@ -188,7 +188,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     backgroundColor: '#fff',
-    flex: 1,
     paddingTop: 20,
     paddingVertical: 10,
     // alignItems: 'center',
