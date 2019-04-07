@@ -65,7 +65,6 @@ export default class BuildingScreen extends React.Component {
 
   render() {
     if (this.state.loading) {
-      console.log("Hits here")
       return null;
     }
 
@@ -207,7 +206,6 @@ export default class BuildingScreen extends React.Component {
     }
 
     _handlePress = async (evt) => {
-      console.log(this.state.routeStatus);
       if (this.state.routeStatus == "START") {
         this.setState({ startXCoord: evt.nativeEvent.locationX,
           startYCoord: evt.nativeEvent.locationY,
@@ -223,7 +221,6 @@ export default class BuildingScreen extends React.Component {
           endYCoord: evt.nativeEvent.locationY
         });
       }
-      console.log("Registered click");
     }
 
     _getStartMarkerStyle = function() {
