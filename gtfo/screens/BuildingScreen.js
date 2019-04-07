@@ -164,7 +164,6 @@ export default class BuildingScreen extends React.Component {
         return null;
       } else {
         var image_string = 'data:image/png;base64,'+json.img[0];
-
         this.setState({
           routeStatus : "DIRECTIONS",
           viewDirections: true,
