@@ -125,13 +125,11 @@ export default class BuildingScreen extends React.Component {
 
       </ImageBackground>
       </View>
-      { this.state.routeStatus == "DIRECTIONS" && (
         <View>
-        <SwitchButton
-        toggleSwitch1 = {this.toggleSwitch1}
-        switch1Value = {this.state.switch1Value}/>
+          <SwitchButton
+          toggleSwitch1 = {this.toggleSwitch1}
+          switch1Value = {this.state.switch1Value}/>
         </View>)
-      }
       </View>
       </TouchableWithoutFeedback>
       </PinchZoomView>
