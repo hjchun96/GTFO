@@ -129,7 +129,7 @@ export default class BuildingScreen extends React.Component {
           <SwitchButton
           toggleSwitch1 = {this.toggleSwitch1}
           switch1Value = {this.state.switch1Value}/>
-        </View>)
+        </View>
       </View>
       </TouchableWithoutFeedback>
       </PinchZoomView>

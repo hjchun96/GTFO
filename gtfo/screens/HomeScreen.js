@@ -66,11 +66,7 @@ export default class HomeScreen extends React.Component {
           backgroundColor="#0079C6"
           centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
         />
-
-
-        <Text style={styles.text}>
-          Closest Buildings
-        </Text>
+        <Text style={styles.text}>Closest Buildings</Text>
         <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
