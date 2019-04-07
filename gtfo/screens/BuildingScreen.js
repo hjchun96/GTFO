@@ -110,7 +110,8 @@ export default class BuildingScreen extends React.Component {
     return (
 
       <React.Fragment>
-      <PinchZoomView minScale = {1.0} maxScale = {4.0}>
+      <PinchZoomView minScale = {1.0} maxScale = {4.0} bounces={true}
+      alwaysBounceHorizontal={true} alwaysBounceVertical={true} bouncesZoom={true}>
       <TouchableWithoutFeedback onPress={(evt) => this._handlePress(evt) } >
       <View style={styles.container}>
       <View style={styles.contentContainer}>
@@ -126,7 +127,7 @@ export default class BuildingScreen extends React.Component {
       </ImageBackground>
       </View>
       { this.state.routeStatus == "DIRECTIONS" && (
-        <View>
+        <View style={{flex: 1}}>
         <SwitchButton
         toggleSwitch1 = {this.toggleSwitch1}
         switch1Value = {this.state.switch1Value}/>
