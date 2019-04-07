@@ -109,7 +109,7 @@ export default class BuildingScreen extends React.Component {
     return (
 
       <React.Fragment>
-      <PinchZoomView minScale = {1.0} maxScale = {4.0} bounces={true}
+      <ScrollView minimumZoomScale = {1.0} maximumZoomScale = {4.0} bounces={true}
       alwaysBounceHorizontal={true} alwaysBounceVertical={true} bouncesZoom={true}>
       <TouchableWithoutFeedback onPress={(evt) => this._handlePress(evt) } >
       <View style={styles.container}>
@@ -132,7 +132,7 @@ export default class BuildingScreen extends React.Component {
         </View>
       </View>
       </TouchableWithoutFeedback>
-      </PinchZoomView>
+    </ScrollView>
       <View>
       {button}
       </View>
