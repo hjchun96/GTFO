@@ -12,6 +12,7 @@ import {
   StatusBar,
   Alert,
   RefreshControl,
+  ImageBackground,
 } from 'react-native';
 import { Header, Button, ListItem } from 'react-native-elements'
 import { Ionicons } from '@expo/vector-icons';
@@ -74,7 +75,15 @@ export default class HomeScreen extends React.Component {
             closestBuildings.map((building, i) => (
               <ListItem
                 key={i}
-                leftIcon={building.icon}
+                leftIcon={building.icon ? 
+                    <Image style={{flex: 1, width: 30, height: 30, resizeMode: 'contain'}} 
+                        source={{uri: building.icon}} >
+                    </Image>
+                  : {
+                    name: 'building-o',
+                    type: 'font-awesome',
+                    size: 30
+                  }}
                 title={building.name}
                 subtitle={building.distance + " km away"}
                 onPress={() => this._handleBuildingPressed(building.name)}
@@ -163,17 +172,13 @@ export default class HomeScreen extends React.Component {
 
       if (Math.abs(lat - myLat) <= .01 && Math.abs(lon - myLon) <= .01) {
         distance = this._getDistance(myLat, myLon, lat, lon).toFixed(3);
-        var icon;
+        var icon = "";
         if (buildings[i].icon) {
-          var iconStr = {uri: 'data:image/png;base64,' + buildings[i].icon[0]};
-          icon = <Image source={{uri: iconStr}} />;
+          icon = 'data:image/png;base64,'+buildings[i].icon[0];
+          closestBuildings.push({"key": i, name, distance, icon});
         } else {
-          icon = {
-                  name: 'building-o',
-                  type: 'font-awesome'
-          };
+          closestBuildings.push({"key": i, name, distance});
         }
-        closestBuildings.push({"key": i, name, distance, icon});
         promises.push(this._retrieveBuildingImg(name));
       }
     }
