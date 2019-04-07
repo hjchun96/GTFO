@@ -35,15 +35,15 @@ export default class HomeScreen extends React.Component {
     } else {
       await this._getLocationAsync();
       await this._getClosestBuildings();
-      this.setState({ loading: false })
+      this.setState({ loading: false });
     }
   }
 
   state = {
     coords: null,
     closestBuildings: [],
+    refreshing: false,
     loading: true,
-    refreshing: false
   }
 
   render() {
@@ -78,7 +78,7 @@ export default class HomeScreen extends React.Component {
               <ListItem
                 key={i}
                 leftIcon={building.icon ? 
-                    <Image style={{width: 250, height: 250, resizeMode: 'contain'}} 
+                    <Image style={{width: 30, height: 30, resizeMode: 'contain'}} 
                         source={{uri: building.icon}} >
                     </Image>
                   : {
@@ -176,7 +176,7 @@ export default class HomeScreen extends React.Component {
         distance = this._getDistance(myLat, myLon, lat, lon).toFixed(3);
         var icon = "";
         if (buildings[i].icon) {
-          icon = 'data:image/png;base64,'+buildings[i].icon[0];
+          icon = 'data:image/png;base64,'+buildings[i].icon;
           closestBuildings.push({"key": i, name, distance, icon});
         } else {
           closestBuildings.push({"key": i, name, distance});
