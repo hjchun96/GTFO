@@ -4,6 +4,7 @@ import base64 from 'base64-js'
 import {
   View,
   Image,
+  Platform,
   AsyncStorage,
   StyleSheet,
   ScrollView
@@ -41,7 +42,7 @@ export default class AddBuildingScreen extends React.Component {
 
   render() {
     return (
-      <KeyboardShift style={{paddingTop: 30, paddingBottom: 30, flex: 1}}>
+      <KeyboardShift style={styles.keyboardShiftStyle}>
         {() => (
         <ScrollView style={{marginTop: 30, marginBottom: -40}}>
           <Spinner
@@ -221,6 +222,21 @@ function stringToUint8Array(str) {
 }
 
 const styles = StyleSheet.create({
+  keyboardShiftStyle: {
+    flex: 1,
+    paddingTop: 30,
+    paddingBottom: 30,
+  },
+  scrollViewStyle: {
+    ...Platform.select({
+      ios: {
+        marginTop: 60
+      },
+      android: {
+        marginTop: 30
+      }
+    })
+  },
   spinnerTextStyle: {
     color: '#FFF'
   },
