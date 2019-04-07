@@ -71,6 +71,7 @@ export default class BuildingScreen extends React.Component {
 
     let routeStatus = this.state.routeStatus;
     let button, startMarker, endMarker;
+    let spinner = null;
 
     if (routeStatus === "START" || routeStatus === "WAITING_FOR_ENDPOINT") {
       button = <View></View>
@@ -80,10 +81,15 @@ export default class BuildingScreen extends React.Component {
       onPress={() => this._handleSetEnd()}
       />
     } else if (routeStatus === "WAITING") {
-      button = <Button
+      button = (<Button
       title="Loading path"
       onPress={function() {}}
-      />
+      />);
+      spinner = (<Spinner
+        visible={this.state.routeStatus === "WAITING"}
+        textContent={'Loading route...'}
+        textStyle={styles.spinnerTextStyle}
+      />);
     } else {
       button = <Button
       title="Start Over"
@@ -108,11 +114,7 @@ export default class BuildingScreen extends React.Component {
       <TouchableWithoutFeedback onPress={(evt) => this._handlePress(evt) } >
       <View style={styles.container}>
       <View style={styles.contentContainer}>
-        <Spinner
-          visible={this.state.routeStatus === "WAITING"}
-          textContent={'Loading route...'}
-          textStyle={styles.spinnerTextStyle}
-        />
+      {spinner}
       <ImageBackground
       resizeMode="contain"
       source = {this.state.switch1Value ? this.state.nn_image : this.state.rendered_image}
@@ -157,9 +159,11 @@ export default class BuildingScreen extends React.Component {
       return response.json();
     }).then(json => {
       if (json.err) {
-        Alert.alert("Invalid Start / End location selected", json.err[0]);
+        setTimeout(() => {
+          alert("Invalid Start/End location selected");
+        }, 100);
         this._handleStartOver();
-        return;
+        return null;
       } else {
         var image_string = 'data:image/png;base64,'+json.img[0];
 
@@ -168,22 +172,26 @@ export default class BuildingScreen extends React.Component {
           viewDirections: true,
           rendered_image: {uri : image_string}
         });
-      }});
-
-      nn_image = getNNImage(this.state.building_name);
-      nn_image.then(response => {
-        return response.json();
-      }).then(json => {
-        if (json.err) {
-          console.log("error fetching NN image");
-          return;
+        return getNNImage(this.state.building_name);
+      }}).then(res => {
+        if (res) {
+          return res.json();
         } else {
-          var image_string = 'data:image/png;base64,'+json.img[0];
-
-          this.setState({
-            nn_image: {uri : image_string}
-          });
-        }});
+          return null;
+        }
+      }).then(json => {
+        if (json) {
+          if (json.err) {
+            console.log("error fetching NN image");
+            return;
+          } else {
+            var image_string = 'data:image/png;base64,'+json.img[0];
+            this.setState({
+              nn_image: {uri : image_string}
+            });
+          }
+        }
+      });
     }
 
     _handleStartOver = async () => {
@@ -195,6 +203,8 @@ export default class BuildingScreen extends React.Component {
         endYCoord: -1,
         routeStatus: "START",
         rendered_image: {uri: image_string},
+      }, () => {
+        this.setState({routeStatus: "START"});
       });
     }
 

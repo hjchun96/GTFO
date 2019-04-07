@@ -147,7 +147,7 @@ export default class AddBuildingScreen extends React.Component {
       }).then(user => {
         if (user) {
           return createBuilding(this.state.name, this.state.photo.base64,
-            this.state.longitude, this.state.latitude)
+            this.state.latitude, this.state.longitude)
         } else {
           return null;
         }
@@ -171,7 +171,6 @@ export default class AddBuildingScreen extends React.Component {
       });
       this.setState({spinner: false});
   }
-
 }
 
 /**
