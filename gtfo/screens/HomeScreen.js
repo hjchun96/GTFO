@@ -6,7 +6,6 @@ import {
   StyleSheet,
   View,
   Text,
-  // Button,
   TouchableOpacity,
   AsyncStorage,
   StatusBar,
@@ -65,9 +64,9 @@ export default class HomeScreen extends React.Component {
         />
         <Text style={styles.text}>Closest Buildings</Text>
         <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-        refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this._getLocationAsync().then(() => this._getClosestBuildings())}/>}
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}
+          refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this._getLocationAsync().then(() => this._getClosestBuildings())}/>}
         >
           {closestBuildings.length != 0 &&
             closestBuildings.map((building, i) => (
@@ -83,9 +82,10 @@ export default class HomeScreen extends React.Component {
         </ScrollView>
         <Button
           small
-          buttonStyle={styles.item}
+          buttonStyle={styles.addBuildingButton}
           icon={{name: 'plus', type: 'font-awesome'}}
-          title='Add a Building'
+          title='ADD A BUILDING'
+          // color= "#0079C6"
           onPress={() => this._handleAddBuildingButtonPressed()}
           />
       </View>
@@ -184,7 +184,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // paddingTop:10,
   },
   contentContainer: {
     backgroundColor: '#fff',
@@ -209,59 +208,13 @@ const styles = StyleSheet.create({
   homeScreenFilename: {
     marginVertical: 7,
   },
-  // homeScreenFilename: {
-  //   marginVertical: 7,
-  // },
-  // addBuildingButton: {
-  //   position: 'absolute',
-  //   bottom: 0,
-  //   left: 0,
-  //   right: 0,
-  //   ...Platform.select({
-  //     ios: {
-  //       shadowColor: 'black',
-  //       shadowOffset: { height: -3 },
-  //       shadowOpacity: 0.1,
-  //       shadowRadius: 3,
-  //     },
-  //     android: {
-  //       elevation: 20,
-  //     },
-  //   }),
-  //   alignItems: 'center',
-  //   backgroundColor: '#fff',
-  //   paddingVertical: 20,
-  //   paddingBottom: 20,
-  // },
   addBuildingButton: {
-    position: 'absolute',
-    // bottom: 30,
-    // left: 10,
-    // right: 10,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingBottom: 20,
+    backgroundColor: "#0079C6",
+    marginVertical: 5,
+    borderRadius:10,
+    // width:"70%",
+    alignItems: 'center'
   },
-  // sectionHeader: {
-  //   paddingTop: 2,
-  //   paddingLeft: 10,
-  //   paddingRight: 10,
-  //   paddingBottom: 2,
-  //   fontSize: 14,
-  //   fontWeight: 'bold',
-  //   backgroundColor: 'rgba(247,247,247,1.0)',
-  // },
   listitem: {
     backgroundColor: "#0079C6",
     borderWidth: 3.0,
@@ -274,23 +227,6 @@ const styles = StyleSheet.create({
     borderWidth: 3.0,
     borderColor: '#000000',
     marginVertical: 5,
-
-    // padding: 10,
-    // marginBottom: 15,
-    // fontSize: 30,
-    // height: 44,
-    // ...Platform.select({
-    //     ios: {
-    //       shadowColor: 'black',
-    //       shadowOffset: { height: -3 },
-    //       shadowOpacity: 0.1,
-    //       shadowRadius: 3,
-    //     },
-    //     android: {
-    //       elevation: 20,
-    //     },
-    //   }),
-    // fontFamily: "Roboto",
   },
   header: {
     backgroundColor: "#0079C6",
@@ -301,6 +237,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     fontWeight: "800",
     fontSize: 24,
+    fontFamily: 'System',
   },
   loading: {
     backgroundColor: "#0079C6",
