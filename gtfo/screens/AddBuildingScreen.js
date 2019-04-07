@@ -175,7 +175,7 @@ export default class AddBuildingScreen extends React.Component {
       }).then(user => {
         if (user) {
           return createBuilding(this.state.name, this.state.photo.base64,
-            this.state.latitude, this.state.longitude, this.state.icon);
+            this.state.latitude, this.state.longitude, this.state.icon.base64);
         } else {
           return null;
         }
