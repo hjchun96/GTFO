@@ -80,14 +80,16 @@ export function createBuilding(name, image, latitude, longitude) {
   });
 }
 
-export function getImage(building) {
+export async function getImage(building) {
   let url = api + "building/image/floorplan/" + building;
-  return fetch(url, {
+  var resp = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
     },
   });
+  var json = await resp.json();
+  return json;
 }
 
 export function getNNImage(building) {
