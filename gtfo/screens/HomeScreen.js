@@ -76,7 +76,7 @@ export default class HomeScreen extends React.Component {
                 // leftAvatar={{ source: { uri: building.avatar_url } }}
                 title={building.name}
                 subtitle={building.distance + " km away"}
-                onPress={() => this._handleBuildingPressed(building.name)}
+                onPress={() =>  this._handleBuildingPressed(building.name)}
               />
             ))
           }
