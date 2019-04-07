@@ -35,18 +35,20 @@ export default class HomeScreen extends React.Component {
     } else {
       await this._getLocationAsync();
       await this._getClosestBuildings();
+      this.setState({ loading: false })
     }
   }
 
   state = {
     coords: null,
     closestBuildings: [],
+    loading: true,
     refreshing: false
   }
 
   render() {
-    const { closestBuildings } = this.state;
-    if (closestBuildings.length == 0) {
+    const { closestBuildings, loading } = this.state;
+    if (loading) {
       return (
         <View style={styles.loading}>
           <Image source={logo1} style={styles.loadingImage} />
@@ -76,7 +78,7 @@ export default class HomeScreen extends React.Component {
               <ListItem
                 key={i}
                 leftIcon={building.icon ? 
-                    <Image style={{flex: 1, width: 30, height: 30, resizeMode: 'contain'}} 
+                    <Image style={{width: 250, height: 250, resizeMode: 'contain'}} 
                         source={{uri: building.icon}} >
                     </Image>
                   : {
