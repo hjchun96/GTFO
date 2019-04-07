@@ -35,6 +35,7 @@ export default class AddBuildingScreen extends React.Component {
     longitude: '',
     latitude: '',
     photo: null,
+    icon: null,
     spinner: false,
   }
 
@@ -42,7 +43,7 @@ export default class AddBuildingScreen extends React.Component {
     return (
       <KeyboardShift style={{paddingTop: 30, paddingBottom: 30, flex: 1}}>
         {() => (
-        <ScrollView style={{marginTop: 30}}>
+        <ScrollView style={{marginTop: 30, marginBottom: -40}}>
           <Spinner
             visible={this.state.spinner}
             textContent={'Loading...'}
@@ -60,14 +61,29 @@ export default class AddBuildingScreen extends React.Component {
             {this.state.photo && (
               <Image
                 source={{ uri: this.state.photo.uri }}
-                style={{ width: 150, height: 150 }}
+                style={styles.photoImage}
               />)
             }
             <Button
               buttonStyle={{ marginTop: 20, marginBottom: 20 }}
               backgroundColor="#03A9F4"
               title="Choose floorplan image"
-              onPress={() => this._handleChoosePhoto()}
+              onPress={() => this._handleChoosePhoto("photo")}
+            />
+          </Card>
+          <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <FormLabel>Floorplan Icon</FormLabel>
+            {this.state.icon && (
+              <Image
+                source={{ uri: this.state.icon.uri }}
+                style={styles.iconImage}
+              />)
+            }
+            <Button
+              buttonStyle={{ marginTop: 20, marginBottom: 20 }}
+              backgroundColor="#03A9F4"
+              title="Choose floorplan icon"
+              onPress={() => this._handleChoosePhoto("icon")}
             />
           </Card>
           <Card>
@@ -95,7 +111,7 @@ export default class AddBuildingScreen extends React.Component {
   }
   // TODO: have a button that allows adding additional floorplan images
 
-  _handleChoosePhoto = async () => {
+  _handleChoosePhoto = async (type) => {
     const permission = await Permissions.getAsync(Permissions.CAMERA_ROLL);
     const options = {
       noData: true,
@@ -111,7 +127,11 @@ export default class AddBuildingScreen extends React.Component {
     } else {
       result = await ImagePicker.launchImageLibraryAsync(options);
     }
-    this.setState({photo: result});
+    if (type === "photo") {
+      this.setState({photo: result});
+    } else {
+      this.setState({icon: result});
+    }
   }
 
   _clearState = async () => {
@@ -155,7 +175,7 @@ export default class AddBuildingScreen extends React.Component {
       }).then(user => {
         if (user) {
           return createBuilding(this.state.name, this.state.photo.base64,
-            this.state.latitude, this.state.longitude);
+            this.state.latitude, this.state.longitude, this.state.icon);
         } else {
           return null;
         }
@@ -204,4 +224,18 @@ const styles = StyleSheet.create({
   spinnerTextStyle: {
     color: '#FFF'
   },
+  iconImage: {
+    width: 50,
+    height: 50,
+    marginTop: 20,
+    marginLeft: 70,
+    flex: 1
+  },
+  photoImage: {
+    width: 150,
+    height: 150,
+    marginTop: 20,
+    marginLeft: 70,
+    flex: 1
+  }
 });

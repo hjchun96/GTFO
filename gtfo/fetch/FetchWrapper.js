@@ -64,7 +64,7 @@ export function checkBuilding(buildingName) {
  *
  * Params: building name, base-64 representation of floorplan image
  **/
-export function createBuilding(name, image, latitude, longitude) {
+export function createBuilding(name, image, latitude, longitude, icon) {
   let url = api + 'building/addFloorplan/' + name;
   return fetch(url, {
     method: 'POST',
@@ -76,6 +76,7 @@ export function createBuilding(name, image, latitude, longitude) {
       img: image,
       lat: latitude,
       lon: longitude,
+      icon: icon,
     })
   });
 }
