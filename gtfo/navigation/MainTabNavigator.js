@@ -9,41 +9,8 @@ import SettingsScreen from '../screens/SettingsScreen';
 import AddBuildingScreen from '../screens/AddBuildingScreen';
 import BuildingScreen from '../screens/BuildingScreen';
 
-const HomeStack = createStackNavigator({
+export default createStackNavigator({
   Home: HomeScreen,
   AddBuilding: AddBuildingScreen,
   Building: BuildingScreen,
-});
-
-HomeStack.navigationOptions = {
-  tabBarLabel: 'Home',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={
-        Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
-      }
-    />
-  ),
-};
-
-const SettingsStack = createStackNavigator({
-  Settings: SettingsScreen,
-});
-
-SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
-    />
-  ),
-};
-
-export default createBottomTabNavigator({
-  HomeStack,
-  SettingsStack,
 });

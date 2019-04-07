@@ -6,19 +6,21 @@ import {
   StyleSheet,
   View,
   Text,
-  Button,
+  // Button,
   TouchableOpacity,
   FlatList,
   ListItem,
   AsyncStorage,
+  StatusBar,
   Alert,
   RefreshControl,
 } from 'react-native';
-import { Icon, Header } from 'react-native-elements'
+import { Header, Button } from 'react-native-elements'
 import { Ionicons } from '@expo/vector-icons';
 import { getAllBuildings, getImage } from "../fetch/FetchWrapper";
 import { Location, Permissions, Constants } from 'expo';
 import logo1 from '../assets/images/logo1.png';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import PTRView from 'react-native-pull-to-refresh';
 
 export default class HomeScreen extends React.Component {
@@ -55,38 +57,45 @@ export default class HomeScreen extends React.Component {
 
     return (
       <View style={styles.container}>
+        <StatusBar
+          barStyle="light-content"
+          containerStyle={{paddingBottom:100}}
+        />
         <Header
-              placement="left"
-              containerStyle={styles.welcomeContainer}
-              backgroundColor="#0079C6"
-              centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
+          containerStyle={styles.welcomeContainer}
+          backgroundColor="#0079C6"
+          centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
         />
 
 
-
+        <Text style={styles.text}>
+          Closest Buildings
+        </Text>
         <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this._getLocationAsync().then(() => this._getClosestBuildings())}/>}
         >
           {closestBuildings.length != 0 &&
-          (<FlatList
+          (<FlatList style={{ backgroundColor:"#fff"}}
             data={closestBuildings}
             renderItem={({item}) =>
               <Button
-                style={styles.item}
+                buttonStyle={styles.listitem}
                 title={item.key}
-                textStyle={{ color: "#0079C6" }}
+                // icon={{name: 'building', type: 'font-awesome'}}
+                textStyle={{ color: "#fff" }}
                 onPress={() => this._handleBuildingPressed(item.key)}
               />}
           />)}
         </ScrollView>
         <Button
-          buttonStyle={styles.addBuildingButton}
-          title="Add a building"
-          textStyle={{ color: "#0079C6" }}
+          small
+          buttonStyle={styles.item}
+          icon={{name: 'plus', type: 'font-awesome'}}
+          title='Add a Building'
           onPress={() => this._handleAddBuildingButtonPressed()}
-        />
+          />
       </View>
     );
   }
@@ -177,16 +186,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    // paddingTop:10,
   },
   contentContainer: {
+    backgroundColor: '#fff',
     flex: 1,
-    paddingTop: 30,
+    paddingTop: 20,
     paddingVertical: 10,
-    alignItems: 'center',
+    // alignItems: 'center',
+    alignItems: 'stretch',
+    marginLeft: 60,
+    marginRight: 60,
   },
   welcomeContainer: {
     alignItems: 'center',
-    paddingTop: 40,
+    marginTop:30
+    // height: 200,
+    // paddingTop: 100,
   },
   welcomeImage: {
     maxWidth: 110,
@@ -198,11 +214,35 @@ const styles = StyleSheet.create({
   homeScreenFilename: {
     marginVertical: 7,
   },
+  // homeScreenFilename: {
+  //   marginVertical: 7,
+  // },
+  // addBuildingButton: {
+  //   position: 'absolute',
+  //   bottom: 0,
+  //   left: 0,
+  //   right: 0,
+  //   ...Platform.select({
+  //     ios: {
+  //       shadowColor: 'black',
+  //       shadowOffset: { height: -3 },
+  //       shadowOpacity: 0.1,
+  //       shadowRadius: 3,
+  //     },
+  //     android: {
+  //       elevation: 20,
+  //     },
+  //   }),
+  //   alignItems: 'center',
+  //   backgroundColor: '#fff',
+  //   paddingVertical: 20,
+  //   paddingBottom: 20,
+  // },
   addBuildingButton: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    // bottom: 30,
+    // left: 10,
+    // right: 10,
     ...Platform.select({
       ios: {
         shadowColor: 'black',
@@ -215,29 +255,57 @@ const styles = StyleSheet.create({
       },
     }),
     alignItems: 'center',
-    backgroundColor: '#fbfbfb',
     paddingVertical: 20,
     paddingBottom: 20,
   },
-  sectionHeader: {
-    paddingTop: 2,
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 2,
-    fontSize: 14,
-    fontWeight: 'bold',
-    backgroundColor: 'rgba(247,247,247,1.0)',
+  // sectionHeader: {
+  //   paddingTop: 2,
+  //   paddingLeft: 10,
+  //   paddingRight: 10,
+  //   paddingBottom: 2,
+  //   fontSize: 14,
+  //   fontWeight: 'bold',
+  //   backgroundColor: 'rgba(247,247,247,1.0)',
+  // },
+  listitem: {
+    backgroundColor: "#0079C6",
+    borderWidth: 3.0,
+    borderColor: '#000000',
+    marginVertical: 2,
   },
+
   item: {
-    padding: 10,
-    marginBottom: 15,
-    fontSize: 30,
-    height: 44,
-    fontFamily: "Roboto",
+    backgroundColor: "#0079C6",
+    borderWidth: 3.0,
+    borderColor: '#000000',
+    marginVertical: 5,
+
+    // padding: 10,
+    // marginBottom: 15,
+    // fontSize: 30,
+    // height: 44,
+    // ...Platform.select({
+    //     ios: {
+    //       shadowColor: 'black',
+    //       shadowOffset: { height: -3 },
+    //       shadowOpacity: 0.1,
+    //       shadowRadius: 3,
+    //     },
+    //     android: {
+    //       elevation: 20,
+    //     },
+    //   }),
+    // fontFamily: "Roboto",
   },
   header: {
     backgroundColor: "#0079C6",
 
+  },
+  text: {
+    textAlign: 'center',
+    paddingTop: 10,
+    fontWeight: "800",
+    fontSize: 24,
   },
   loading: {
     backgroundColor: "#0079C6",
