@@ -126,13 +126,14 @@ public class BuildingSvc {
         }
     }
 
-    public void addFloorplan(String name, String img, String type, String lat, String lon) {
+    public void addFloorplan(String name, String img, String type, String lat, String lon, String icon) {
         byte[] imageByteArray = Base64.decodeBase64(img);
         addFloorplan(name, imageByteArray, type);
         Document building = new Document("name", name);
         building.append("s3_url", name);
         building.append("lat", lat);
         building.append("lon", lon);
+        building.append("icon", icon);
         buildingCollection.insertOne(building);
     }
 
