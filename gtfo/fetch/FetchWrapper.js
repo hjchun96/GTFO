@@ -64,7 +64,7 @@ export function checkBuilding(buildingName) {
  *
  * Params: building name, base-64 representation of floorplan image
  **/
-export function createBuilding(name, image, latitude, longitude) {
+export function createBuilding(name, image, latitude, longitude, icon) {
   let url = api + 'building/addFloorplan/' + name;
   return fetch(url, {
     method: 'POST',
@@ -76,18 +76,21 @@ export function createBuilding(name, image, latitude, longitude) {
       img: image,
       lat: latitude,
       lon: longitude,
+      icon: icon,
     })
   });
 }
 
-export function getImage(building) {
+export async function getImage(building) {
   let url = api + "building/image/floorplan/" + building;
-  return fetch(url, {
+  var resp = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
     },
   });
+  var json = await resp.json();
+  return json;
 }
 
 export function getNNImage(building) {

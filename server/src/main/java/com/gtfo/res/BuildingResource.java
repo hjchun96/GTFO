@@ -30,9 +30,10 @@ public class BuildingResource {
             throws JSONException {
         JSONObject json = new JSONObject(body);
         String img = json.getString("img");
+        String icon = json.getString("icon");
         String lat = json.getString("lat");
         String lon = json.getString("lon");
-        buildingSvc.addFloorplan(floorplanName, img, "floorplans", lat, lon);
+        buildingSvc.addFloorplan(floorplanName, img, "floorplans", lat, lon, icon);
         buildingSvc.extractWalls(floorplanName);
         System.out.println("Finished creating building");
         return Response.ok().build();

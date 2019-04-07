@@ -11,13 +11,14 @@ import {
   StatusBar,
   Alert,
   RefreshControl,
+  ImageBackground,
 } from 'react-native';
 import { Header, Button, ListItem } from 'react-native-elements'
 import { Ionicons } from '@expo/vector-icons';
 import { getAllBuildings, getImage } from "../fetch/FetchWrapper";
 import { Location, Permissions, Constants } from 'expo';
 import logo1 from '../assets/images/logo1.png';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import PTRView from 'react-native-pull-to-refresh';
 
 export default class HomeScreen extends React.Component {
@@ -25,25 +26,28 @@ export default class HomeScreen extends React.Component {
     header: null,
   };
 
-  componentWillMount() {
+  async componentWillMount() {
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
         errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
       });
     } else {
-      this._getLocationAsync().then(() => this._getClosestBuildings());
+      await this._getLocationAsync();
+      await this._getClosestBuildings();
+      this.setState({ loading: false });
     }
   }
 
   state = {
     coords: null,
     closestBuildings: [],
-    refreshing: false
+    refreshing: false,
+    loading: true,
   }
 
   render() {
-    const { closestBuildings } = this.state;
-    if (closestBuildings.length == 0) {
+    const { closestBuildings, loading } = this.state;
+    if (loading) {
       return (
         <View style={styles.loading}>
           <Image source={logo1} style={styles.loadingImage} />
@@ -72,7 +76,15 @@ export default class HomeScreen extends React.Component {
             closestBuildings.map((building, i) => (
               <ListItem
                 key={i}
-                // leftAvatar={{ source: { uri: building.avatar_url } }}
+                leftIcon={building.icon ? 
+                    <Image style={{width: 30, height: 30, resizeMode: 'contain', marginRight: 5}} 
+                        source={{uri: building.icon}} >
+                    </Image>
+                  : {
+                    name: 'building-o',
+                    type: 'font-awesome',
+                    size: 30
+                  }}
                 title={building.name}
                 subtitle={building.distance + " km away"}
                 onPress={() => this._handleBuildingPressed(building.name)}
@@ -129,21 +141,14 @@ export default class HomeScreen extends React.Component {
     return Promise.resolve(1);
   }
 
-  _retrieveBuildingImg = (building_name) => {
+  _retrieveBuildingImg = async (building_name) => {
     if (building_name != '') {
       // Call endpoint
-      var image = getImage(building_name);
-      image.then(resp => resp.json())
-        .then(json => {
-          if (json.err) {
-            console.log("Error fetching image");
-            Alert.alert("Could not find floorplan image");
-          } else {
-            var image_string = 'data:image/png;base64,'+json.img[0];
-            this.setState({[building_name]: image_string})
-          }
-        })
+      var image = await getImage(building_name);
+      var image_string = 'data:image/png;base64,'+image.img[0];
+      this.setState({[building_name]: image_string})
     }
+    return Promise.resolve(1);
   }
 
   _handleBuildingPressed = (building_name) => {
@@ -160,6 +165,8 @@ export default class HomeScreen extends React.Component {
     var myLat = this.state.coords.latitude;
     var myLon = this.state.coords.longitude;
 
+    var promises = [];
+
     for (var i = 0; i < buildings.length; i++) {
       var name = buildings[i].name;
       var lat = parseFloat(buildings[i].lat);
@@ -167,15 +174,24 @@ export default class HomeScreen extends React.Component {
 
       if (Math.abs(lat - myLat) <= .01 && Math.abs(lon - myLon) <= .01) {
         distance = this._getDistance(myLat, myLon, lat, lon).toFixed(3);
-        closestBuildings.push({name, distance});
-        this._retrieveBuildingImg(name);
+        var icon = "";
+        if (buildings[i].icon) {
+          icon = 'data:image/png;base64,'+buildings[i].icon;
+          closestBuildings.push({"key": i, name, distance, icon});
+        } else {
+          closestBuildings.push({"key": i, name, distance});
+        }
+        promises.push(this._retrieveBuildingImg(name));
       }
     }
+
+    await Promise.all(promises);
 
     closestBuildings.sort((ele1, ele2) => {
         return ele1.distance > ele2.distance;
     })
     this.setState({ closestBuildings, "refreshing": false })
+    return Promise.resolve(1);
   }
 
 }
