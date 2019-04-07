@@ -187,7 +187,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     backgroundColor: '#fff',
-    flex: 1,
     paddingTop: 20,
     paddingVertical: 10,
     // alignItems: 'center',
