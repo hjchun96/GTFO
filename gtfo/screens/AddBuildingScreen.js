@@ -42,7 +42,7 @@ export default class AddBuildingScreen extends React.Component {
     return (
       <KeyboardShift style={{paddingTop: 30, paddingBottom: 30, flex: 1}}>
         {() => (
-        <ScrollView style={{}}>
+        <ScrollView style={{marginTop: 30}}>
           <Spinner
             visible={this.state.spinner}
             textContent={'Loading...'}
