@@ -65,7 +65,6 @@ export default class BuildingScreen extends React.Component {
 
   render() {
     if (this.state.loading) {
-      console.log("Hits here")
       return null;
     }
 
@@ -126,13 +125,11 @@ export default class BuildingScreen extends React.Component {
 
       </ImageBackground>
       </View>
-      { this.state.routeStatus == "DIRECTIONS" && (
         <View style={{flex: 1}}>
-        <SwitchButton
-        toggleSwitch1 = {this.toggleSwitch1}
-        switch1Value = {this.state.switch1Value}/>
-        </View>)
-      }
+          <SwitchButton
+          toggleSwitch1 = {this.toggleSwitch1}
+          switch1Value = {this.state.switch1Value}/>
+        </View>
       </View>
       </TouchableWithoutFeedback>
       </PinchZoomView>
@@ -167,7 +164,6 @@ export default class BuildingScreen extends React.Component {
         return null;
       } else {
         var image_string = 'data:image/png;base64,'+json.img[0];
-
         this.setState({
           routeStatus : "DIRECTIONS",
           viewDirections: true,
@@ -210,7 +206,6 @@ export default class BuildingScreen extends React.Component {
     }
 
     _handlePress = async (evt) => {
-      console.log(this.state.routeStatus);
       if (this.state.routeStatus == "START") {
         this.setState({ startXCoord: evt.nativeEvent.locationX,
           startYCoord: evt.nativeEvent.locationY,
@@ -226,7 +221,6 @@ export default class BuildingScreen extends React.Component {
           endYCoord: evt.nativeEvent.locationY
         });
       }
-      console.log("Registered click");
     }
 
     _getStartMarkerStyle = function() {

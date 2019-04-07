@@ -8,14 +8,12 @@ import {
   Text,
   // Button,
   TouchableOpacity,
-  FlatList,
-  ListItem,
   AsyncStorage,
   StatusBar,
   Alert,
   RefreshControl,
 } from 'react-native';
-import { Header, Button } from 'react-native-elements'
+import { Header, Button, ListItem } from 'react-native-elements'
 import { Ionicons } from '@expo/vector-icons';
 import { getAllBuildings, getImage } from "../fetch/FetchWrapper";
 import { Location, Permissions, Constants } from 'expo';
@@ -47,7 +45,6 @@ export default class HomeScreen extends React.Component {
   render() {
     const { closestBuildings } = this.state;
     if (closestBuildings.length == 0) {
-      console.log("Loading closest buildings")
       return (
         <View style={styles.loading}>
           <Image source={logo1} style={styles.loadingImage} />
@@ -66,28 +63,23 @@ export default class HomeScreen extends React.Component {
           backgroundColor="#0079C6"
           centerComponent={<Image source={logo1} style={styles.welcomeImage} />}
         />
-
-
-        <Text style={styles.text}>
-          Closest Buildings
-        </Text>
+        <Text style={styles.text}>Closest Buildings</Text>
         <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this._getLocationAsync().then(() => this._getClosestBuildings())}/>}
         >
           {closestBuildings.length != 0 &&
-          (<FlatList style={{ backgroundColor:"#fff"}}
-            data={closestBuildings}
-            renderItem={({item}) =>
-              <Button
-                buttonStyle={styles.listitem}
-                title={item.key}
-                // icon={{name: 'building', type: 'font-awesome'}}
-                textStyle={{ color: "#fff" }}
-                onPress={() => this._handleBuildingPressed(item.key)}
-              />}
-          />)}
+            closestBuildings.map((building, i) => (
+              <ListItem
+                key={i}
+                // leftAvatar={{ source: { uri: building.avatar_url } }}
+                title={building.name}
+                subtitle={building.distance + " km away"}
+                onPress={() => this._handleBuildingPressed(building.name)}
+              />
+            ))
+          }
         </ScrollView>
         <Button
           small
@@ -98,6 +90,24 @@ export default class HomeScreen extends React.Component {
           />
       </View>
     );
+  }
+
+  _getDistance = (lat1, lon1, lat2, lon2) => {
+    var R = 6371; // Radius of the earth in km
+    var dLat = this._degreeToRadius(lat2-lat1);  // deg2rad below
+    var dLon = this._degreeToRadius(lon2-lon1); 
+    var a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(this._degreeToRadius(lat1)) * Math.cos(this._degreeToRadius(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      ; 
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var d = R * c; // Distance in km
+    return d;
+  }
+
+  _degreeToRadius = (deg) => {
+    return deg * (Math.PI/180)
   }
 
   _handleAddBuildingButtonPressed = () => {
@@ -115,7 +125,6 @@ export default class HomeScreen extends React.Component {
 
     let location = await Location.getCurrentPositionAsync({});
     this.setState({ "coords": location.coords});
-    console.log("got the coords:" + JSON.stringify(location.coords));
 
     return Promise.resolve(1);
   }
@@ -151,17 +160,13 @@ export default class HomeScreen extends React.Component {
     var myLat = this.state.coords.latitude;
     var myLon = this.state.coords.longitude;
 
-    console.log("myLat: " + myLat + ", myLon: " + myLon)
-
     for (var i = 0; i < buildings.length; i++) {
       var name = buildings[i].name;
       var lat = parseFloat(buildings[i].lat);
       var lon = parseFloat(buildings[i].lon);
 
-      console.log("Building " + name + " lives on lat: " + lat + ", lon: " + lon);
-
       if (Math.abs(lat - myLat) <= .01 && Math.abs(lon - myLon) <= .01) {
-        distance = Math.pow(Math.abs(lat - myLat), 2) + Math.pow(Math.abs(lon - myLon), 2);
+        distance = this._getDistance(myLat, myLon, lat, lon).toFixed(3);
         closestBuildings.push({name, distance});
         this._retrieveBuildingImg(name);
       }
@@ -170,14 +175,7 @@ export default class HomeScreen extends React.Component {
     closestBuildings.sort((ele1, ele2) => {
         return ele1.distance > ele2.distance;
     })
-
-    var res = [];
-    for (var i = 0; i < closestBuildings.length; i++) {
-      res.push({key: closestBuildings[i].name});
-
-    }
-    console.log("set the closestBuildings, done refreshing.");
-    this.setState({ closestBuildings: res, "refreshing": false })
+    this.setState({ closestBuildings, "refreshing": false })
   }
 
 }
@@ -195,8 +193,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     // alignItems: 'center',
     alignItems: 'stretch',
-    marginLeft: 60,
-    marginRight: 60,
   },
   welcomeContainer: {
     alignItems: 'center',

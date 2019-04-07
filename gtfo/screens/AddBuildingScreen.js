@@ -42,7 +42,7 @@ export default class AddBuildingScreen extends React.Component {
     return (
       <KeyboardShift style={{paddingTop: 30, paddingBottom: 30, flex: 1}}>
         {() => (
-        <ScrollView style={{}}>
+        <ScrollView style={{marginTop: 30}}>
           <Spinner
             visible={this.state.spinner}
             textContent={'Loading...'}
@@ -122,24 +122,32 @@ export default class AddBuildingScreen extends React.Component {
   }
 
   _addBuilding = async () => {
-    this.setState({spinner: true}, () => { this.setState({spinner: true}) });
-    console.log("here");
     if (!this.state.name || !this.state.photo) {
-      alert("Please fill out all fields and choose a floorplan image.");
       this.setState({spinner: false});
+      setTimeout(() => {
+        alert("Please fill out all fields and choose a floorplan image.");
+      }, 100);
       return;
     }
 
     if (!this.state.longitude || !this.state.latitude) {
-      alert("Please input the coordinates for the building");
+      this.setState({spinner: false});
+      setTimeout(() => {
+        alert("Please input the coordinates for the building");
+      }, 100);
       this.setState({spinner: false});
       return;
     }
 
+    this.setState({spinner: true}, () => { this.setState({spinner: true}) });
+
     checkBuilding(this.state.name)
       .then(res => {
         if (res) {
-          alert("Building name already exists. Please pick a different name.");
+          this.setState({spinner: false});
+          setTimeout(() => {
+            alert("Building name already exists. Please pick a different name.");
+          }, 100);
           return null;
         } else {
           return AsyncStorage.getItem('userToken');
@@ -147,16 +155,22 @@ export default class AddBuildingScreen extends React.Component {
       }).then(user => {
         if (user) {
           return createBuilding(this.state.name, this.state.photo.base64,
-            this.state.latitude, this.state.longitude)
+            this.state.latitude, this.state.longitude);
         } else {
           return null;
         }
       }).then(success => {
         if (success) {
-          return getImage(this.state.name)
+          return getImage(this.state.name);
         }
-      }).then(resp => resp.json())
-        .then(json => {
+      }).then(resp => {
+        if (resp) {
+          return resp.json();
+        } else {
+          return null;
+        }
+      }).then(json => {
+        if (json) {
           this.setState({spinner: false});
           if (json.err) {
             console.log("Error fetching image");
@@ -168,6 +182,7 @@ export default class AddBuildingScreen extends React.Component {
               img: image_string,
             });
           }
+        }
       });
       this.setState({spinner: false});
   }

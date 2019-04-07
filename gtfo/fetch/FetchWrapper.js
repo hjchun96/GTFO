@@ -77,7 +77,7 @@ export function createBuilding(name, image, latitude, longitude) {
       lat: latitude,
       lon: longitude,
     })
-  })
+  });
 }
 
 export function getImage(building) {
