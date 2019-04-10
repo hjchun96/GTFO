@@ -125,11 +125,13 @@ export default class BuildingScreen extends React.Component {
 
       </ImageBackground>
       </View>
+        { this.state.nn_image != '' &&
         <View style={{flex: 1}}>
           <SwitchButton
           toggleSwitch1 = {this.toggleSwitch1}
           switch1Value = {this.state.switch1Value}/>
         </View>
+      }
       </View>
       </TouchableWithoutFeedback>
     </ScrollView>
@@ -194,6 +196,7 @@ export default class BuildingScreen extends React.Component {
     _handleStartOver = async () => {
       let image_string = this.props.navigation.getParam('img', '')
       this.setState({
+        switch1Value: false,
         startXCoord: -1,
         startYCoord: -1,
         endXCoord: -1,
