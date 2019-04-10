@@ -19,18 +19,18 @@ export default class SignInScreen extends React.Component {
     return (
       <KeyboardShift>
         {() => (
-        <ScrollView style={{ paddingVertical: 20 }}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={logo1}
-              style={styles.welcomeImage}
-            />
-          </View>
-          <Card title="Sign In">
-            <FormLabel>Email</FormLabel>
-            <FormInput
-              placeholder="Email address..."
-              onChangeText={input => this.state.email = input}
+          <ScrollView style={{ paddingVertical: 20 }}>
+            <View style={styles.welcomeContainer}>
+              <Image
+                source={logo1}
+                style={styles.welcomeImage}
+              />
+            </View>
+            <Card title="Sign In">
+              <FormLabel>Email</FormLabel>
+              <FormInput
+                placeholder="Email address..."
+                onChangeText={input => this.state.email = input}
             />
             <FormLabel>Password</FormLabel>
             <FormInput

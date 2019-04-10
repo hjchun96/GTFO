@@ -109,32 +109,32 @@ export default class BuildingScreen extends React.Component {
     return (
 
       <React.Fragment>
-      <ScrollView minimumZoomScale = {1.0} maximumZoomScale = {4.0} bounces={true}
-      alwaysBounceHorizontal={true} alwaysBounceVertical={true} bouncesZoom={true}>
-      <TouchableWithoutFeedback onPress={(evt) => this._handlePress(evt) } >
-      <View style={styles.container}>
-      <View style={styles.contentContainer}>
-      {spinner}
-      <ImageBackground
-      resizeMode="contain"
-      source = {this.state.switch1Value ? this.state.nn_image : this.state.rendered_image}
-      style = {styles.floorPlan}
-      >
-      {endMarker}
-      {startMarker}
+        <PinchZoomView minimumZoomScale = {1.0} maximumZoomScale = {4.0} bounces={true}
+          alwaysBounceHorizontal={true} alwaysBounceVertical={true} bouncesZoom={true}>
+          <TouchableWithoutFeedback onPress={(evt) => this._handlePress(evt) } >
+            <View style={styles.container}>
+              <View style={styles.contentContainer}>
+                {spinner}
+                <ImageBackground
+                  resizeMode="contain"
+                  source = {this.state.switch1Value ? this.state.nn_image : this.state.rendered_image}
+                  style = {styles.floorPlan}
+                >
+                  {endMarker}
+                  {startMarker}
 
-      </ImageBackground>
-      </View>
-        { this.state.nn_image != '' &&
-        <View style={{flex: 1}}>
-          <SwitchButton
-          toggleSwitch1 = {this.toggleSwitch1}
-          switch1Value = {this.state.switch1Value}/>
-        </View>
-      }
-      </View>
-      </TouchableWithoutFeedback>
-    </ScrollView>
+                </ImageBackground>
+              </View>
+              { this.state.nn_image != '' &&
+                <View style={{flex: 1}}>
+                  <SwitchButton
+                    toggleSwitch1 = {this.toggleSwitch1}
+                    switch1Value = {this.state.switch1Value}/>
+                </View>
+              }
+            </View>
+          </TouchableWithoutFeedback>
+        </PinchZoomView>
       <View>
       {button}
       </View>
