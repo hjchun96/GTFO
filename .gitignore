@@ -3,6 +3,7 @@ server/keys
 server/.idea/*
 server/target/*
 server/keys
+server/nn_server/.env
 src/.idea/*
 src/target/*
 src/keys
