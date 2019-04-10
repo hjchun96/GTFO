@@ -16,7 +16,7 @@ import boto3
 import botocore
 import io
 import ConfigParser
- 
+import matplotlib.pyplot as plt
 import pdb
 
 BUCKET_NAME = "gtfo"
@@ -48,7 +48,38 @@ def name_to_image(name):
 
 @app.route('/detect_walls', methods=["GET", "POST"])
 def detect_walls():
-    image = name_to_image(request.args.get('image_name'))
+    img = name_to_image(request.args.get('image_name'))
+	result = feed_image_to_net(img, './GTFO_19.pt')
+	img = numpy.array(result)
+	kernel = np.ones((3,3),np.uint8)
+	img = cv2.dilate(img,kernel,iterations = 1)
+	t = torch.Tensor([0.3])
+	trans = transforms.ToTensor()
+	binarized = (trans(img) > t).float() * 1
+	pil_trans = transforms.ToPILImage()
+	binarized_output = pil_trans(binarized)
+	binarized_output.save("static/output.png")
+
+	display_img(binarized_output)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     image_result = feed_image_to_net(image)
     result = image_result
