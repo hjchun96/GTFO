@@ -73,7 +73,7 @@ export default class AddBuildingScreen extends React.Component {
               />
             </Card>
             <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-              <FormLabel labelStyle={styles.formLabel}>Floorplan Icon</FormLabel>
+              <FormLabel labelStyle={styles.formLabel}>Floorplan Icon (optional)</FormLabel>
               {this.state.icon && (
                 <Image
                   source={{ uri: this.state.icon.uri }}
@@ -175,6 +175,10 @@ export default class AddBuildingScreen extends React.Component {
         }
       }).then(user => {
         if (user) {
+          if (!this.state.icon) {
+            return createBuilding(this.state.name, this.state.photo.base64,
+            this.state.latitude, this.state.longitude, null);
+          }
           return createBuilding(this.state.name, this.state.photo.base64,
             this.state.latitude, this.state.longitude, this.state.icon.base64);
         } else {

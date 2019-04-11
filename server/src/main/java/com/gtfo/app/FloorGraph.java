@@ -300,6 +300,7 @@ public final class FloorGraph {
                             if (newX < 0 || newX >= g.grid.length || newY < 0 || newY >= g.grid[0].length) {
                                 continue;
                             }
+
                             floorPlan.setRGB(p.x + i, p.y + j, RED);
                         }
                     }

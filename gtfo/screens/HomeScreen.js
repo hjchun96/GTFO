@@ -76,7 +76,7 @@ export default class HomeScreen extends React.Component {
             closestBuildings.map((building, i) => (
               <ListItem
                 key={i}
-                leftIcon={building.icon ? 
+                leftIcon={building.hasIcon ? 
                     <Image style={{width: 30, height: 30, resizeMode: 'contain', marginRight: 5}} 
                         source={{uri: building.icon}} >
                     </Image>
@@ -175,11 +175,11 @@ export default class HomeScreen extends React.Component {
       if (Math.abs(lat - myLat) <= .01 && Math.abs(lon - myLon) <= .01) {
         distance = this._getDistance(myLat, myLon, lat, lon).toFixed(3);
         var icon = "";
-        if (buildings[i].icon) {
+        if (buildings[i].icon != "null") {
           icon = 'data:image/png;base64,'+buildings[i].icon;
-          closestBuildings.push({"key": i, name, distance, icon});
+          closestBuildings.push({"key": i, name, distance, icon, "hasIcon": true});
         } else {
-          closestBuildings.push({"key": i, name, distance});
+          closestBuildings.push({"key": i, name, distance, "hasIcon": false});
         }
         promises.push(this._retrieveBuildingImg(name));
       }
