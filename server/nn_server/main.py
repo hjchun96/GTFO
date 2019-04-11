@@ -25,17 +25,17 @@ class CPDataset(Dataset):
         return len([name for name in os.listdir(self.root_dir) if os.path.isfile(self.root_dir+name)])
 
     def __getitem__(self, idx):
-
+        
         img_dir = ''
         img_num = str(idx + 1)
         img_ext = '.png'
         img_file = img_num + img_ext
         img_name = os.path.join(self.root_dir, img_dir, img_file)
         image = Image.open(img_name)
-
+        
         if self.transform:
           image = self.transform(image)
-
+        
         sample = None
         if self.roi_pool:
           s = image[1,:,:].size()
@@ -49,23 +49,23 @@ class CPDataset(Dataset):
           gt_pooled = roi_align(gt_pooled, roi, chunk_size).squeeze().float()
 
           sample = {
-                    'image'        : im_pooled,
-                    'gt_image'     : gt_pooled,
+                    'image'        : im_pooled, 
+                    'gt_image'     : gt_pooled, 
                    }
         else:
           sample = {
-                  'image'        : image[1,:,:].unsqueeze(0),
-                  'gt_image'     : image[0,:,:],
+                  'image'        : image[1,:,:].unsqueeze(0), 
+                  'gt_image'     : image[0,:,:], 
                  }
-
+          
         return sample
-
+      
 data_dir = "CIS680_FINAL/data"
 
 files = os.listdir(data_dir)
 imgs = [i for i in files if i.endswith("png")]
 
-chunk_size = 128
+chunk_size = 256
 
 np.random.seed(0)
 num_train = len(imgs)
@@ -115,8 +115,8 @@ def display_img(image):
   fig,ax = plt.subplots(1)
   ax.imshow(image)
   plt.show()
-
-
+  
+  
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -169,20 +169,21 @@ class Net(nn.Module):
 #             x = self.relu(self.bnT3(self.convT3(x)))
 #             x = torch.sigmoid(self.convT4(x))
 
-        return x
-
+        return x 
+  
 def run_nn(trainloader, testloader, learning_rate=10e-2):
     net = Net()
 
+    pdb.set_trace()
     net.train()
     net = net.to(device)
-    optimizer = torch.optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
+    optimizer = torch.optim.Adam(net.parameters(), betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
 #     optimizer = optim.SGD(net.parameters(), lr=learning_rate, weight_decay=0.00001)
     criterion = nn.BCELoss(reduce=False)
 
     accuracies = []
     losses = []
-
+    
     # Run the dataset through 10 times total
     numIters = 20
     for epoch in range(numIters):
@@ -203,7 +204,7 @@ def run_nn(trainloader, testloader, learning_rate=10e-2):
             optimizer.zero_grad()
 
             net_out = net(input_images).to(device)
-
+            
 #             pdb.set_trace()
             ### Comment below when testing deconv
             resized_output = F.interpolate(net_out.unsqueeze(0), size=(1,chunk_size,chunk_size)).squeeze()
@@ -212,39 +213,43 @@ def run_nn(trainloader, testloader, learning_rate=10e-2):
             fn_mask = resized_output >= .5
             fn_mask = fn_mask & (gt_images < .5)
             fn_mask = fn_mask * 1
-
+        
             tn_mask = resized_output >= .5
             tn_mask = tn_mask & (gt_images >= .5)
             tn_mask = tn_mask * 1
-
+            
             tp_mask = resized_output < .5
             tp_mask = tp_mask & (gt_images < .5)
             tp_mask = tp_mask * 1
-
+            
             fp_mask = resized_output < .5
             fp_mask = fp_mask & (gt_images >= .5)
             fp_mask = fp_mask * 1
-
+            
             n_count = torch.sum(gt_images >= .5)
             p_count = torch.sum(gt_images < .5)
-
+            
+            if n_count < 100 or p_count < 100:
+              print("Skipped")
+              continue
+            
             fn_count = torch.sum(fn_mask > 0)
             tn_count = torch.sum(tn_mask > 0)
             tp_count = torch.sum(tp_mask > 0)
             fp_count = torch.sum(fp_mask > 0)
-
+            
             total_size = fn_count + tn_count + tp_count + fp_count
-
+            
             print("fn_count: " + str(fn_count) + " fp_count: " + str(fp_count) + " tn_count: " + str(tn_count) +  " tp_count: " + str(tp_count))
-
-            fn_normalized = (fn_mask.float() / n_count) #if not(fn_count >= 50 else 0
+            
+            fn_normalized = (fn_mask.float() / p_count) #if not(fn_count >= 50 else 0
             tn_normalized = (tn_mask.float() / n_count) #if not(tn_count == 0) else 0
             tp_normalized = (tp_mask.float() / p_count) #if not(tp_count == 0) else 0
-            fp_normalized = (fp_mask.float() / p_count) #if fp_count >= 50 else 0
-
-
-            loss_mask = 3 * fn_normalized  + 1 * tn_normalized + 1 * tp_normalized + 1 * fp_normalized
-
+            fp_normalized = (fp_mask.float() / n_count) #if fp_count >= 50 else 0
+            
+            
+            loss_mask = 1 * fn_normalized  + 1 * tn_normalized + 1 * tp_normalized + 1 * fp_normalized
+        
             loss = criterion(resized_output, gt_images)
             loss = torch.sum(loss * loss_mask.float() * total_size) / (loss_mask.numel())
             losses.append(loss)
@@ -255,7 +260,7 @@ def run_nn(trainloader, testloader, learning_rate=10e-2):
             predictions = (resized_output >= 0.5).float()
             accuracy = torch.sum(torch.eq(predictions, gt_images)).item() / np.prod(predictions.shape)
             accuracies.append(accuracy)
-
+            
             # Calculate precision and recall
             pos_correct = torch.sum(((predictions+gt_images) == 2).float())
             recall = pos_correct / torch.sum(gt_images)
@@ -290,17 +295,17 @@ def run_nn(trainloader, testloader, learning_rate=10e-2):
 
 #         # Use network
 #         net_out = net(input_images).to(device)
-
+        
 #         pdb.set_trace()
 #         ### Comment below when testing deconv
-#         resized_output = F.interpolate(net_out.unsqueeze(0), size=(1,512,512)).squeeze()
+#         resized_output = F.interpolate(net_out.unsqueeze(0), size=(1,512,512)).squeeze()      
 #         ### Uncomment below when testing deconv
 # #         resized_output = net_out.squeeze()
-
-
+  
+  
 #         # Calculate loss
 #         loss = criterion(resized_output, gt_images)
-
+        
 #         # Calculate test accuracy
 #         predictions = (resized_output > 0.5).float()
 #         accuracy = torch.sum(torch.eq(predictions, gt_images)).item() / np.prod(predictions.shape)
@@ -309,7 +314,7 @@ def run_nn(trainloader, testloader, learning_rate=10e-2):
 #         pos_correct = torch.sum(((predictions+gt_images) == 2).float())
 #         recall = pos_correct / torch.sum(gt_images)
 #         precision = pos_correct / torch.sum(predictions)
-
+        
 #         # Add to statistics
 #         running_loss += loss.item() * n
 #         running_acc += accuracy.item() * n
@@ -317,7 +322,7 @@ def run_nn(trainloader, testloader, learning_rate=10e-2):
 #         running_precision += precision.item() * n
 #       print("Epoch: {0:}, Loss: {1:.4f}, ACC: {2:.4f}, Recall: {3:.4f}, Precision: {4:.4f}".format(
 #           0, running_loss/count, running_acc/count, running_recall/count, running_precision/count))
-
+      
 #     # Return accuracy and loss
 #     return accuracies, losses, net
 
@@ -341,16 +346,16 @@ def get_wall_segmentation_from_image(net, input_image):
       chunk = rgb2grey(chunk)
       chunk = torch.from_numpy(chunk).unsqueeze(0).unsqueeze(0).float().to(device)
       net_out = net(chunk).to(device).squeeze()
-
+      
       ## Comment below line when testing deconv for upsampling
       resized_output = F.interpolate(net_out.unsqueeze(0).unsqueeze(0).unsqueeze(0), size=(1,chunk_size,chunk_size)).squeeze()
       ## Uncomment below line when testing deconv for upsampling
 #       resized_output = net_out.squeeze()
       predicted_image[chunk_dim * i:chunk_dim * (i+1), chunk_dim * j:chunk_dim * (j+1)] = resized_output.cpu().detach().numpy()
   return predicted_image
+      
 
-
-def feed_image_to_net(image_data, pt_file):
+def feed_image_to_net(image_data, pt_file): 
 #   net = run_nn(train_dataloader, test_dataloader)
   net = Net()
   device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
