@@ -135,7 +135,7 @@ export default class BuildingScreen extends React.Component {
             </View>
           </TouchableWithoutFeedback>
         </PinchZoomView>
-      <View>
+        <View>
       {button}
       </View>
       </React.Fragment>

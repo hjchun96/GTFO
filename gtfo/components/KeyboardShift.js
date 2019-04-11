@@ -1,6 +1,6 @@
 import { PropTypes } from 'prop-types';
 import React, { Component } from 'react';
-import { Animated, Dimensions, Keyboard, StyleSheet, TextInput, UIManager } from 'react-native';
+import { Animated, Platform, Dimensions, Keyboard, StyleSheet, TextInput, UIManager } from 'react-native';
 
 const { State: TextInputState } = TextInput;
 
@@ -37,7 +37,7 @@ export default class KeyboardShift extends Component {
       const fieldHeight = height;
       const fieldTop = pageY;
       const gap = (windowHeight - keyboardHeight) - (fieldTop + fieldHeight);
-      if (gap >= 20) {
+      if (gap >= 0) {
         return;
       }
       Animated.timing(
@@ -55,7 +55,7 @@ export default class KeyboardShift extends Component {
     Animated.timing(
       this.state.shift,
       {
-        toValue: 20,
+        toValue: Platform.OS === 'ios' ? 20 : -20,
         duration: 400,
         useNativeDriver: true,
       }

@@ -44,60 +44,60 @@ export default class AddBuildingScreen extends React.Component {
     return (
       <KeyboardShift style={styles.keyboardShiftStyle}>
         {() => (
-        <ScrollView style={{marginTop: 30, marginBottom: -40}}>
-          <Spinner
-            visible={this.state.spinner}
-            textContent={'Loading...'}
-            textStyle={styles.spinnerTextStyle}
-          />
-          <Card>
-            <FormLabel>Building Name</FormLabel>
-            <FormInput
-              placeholder="Name..."
-              onChangeText={input => this.state.name = input}
+          <ScrollView style={styles.scrollViewStyle}>
+            <Spinner
+              visible={this.state.spinner}
+              textContent={'Loading...'}
+              textStyle={styles.spinnerTextStyle}
             />
-          </Card>
-          <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <FormLabel>Floorplan Image</FormLabel>
-            {this.state.photo && (
-              <Image
-                source={{ uri: this.state.photo.uri }}
-                style={styles.photoImage}
-              />)
-            }
-            <Button
-              buttonStyle={{ marginTop: 20, marginBottom: 20 }}
-              backgroundColor="#03A9F4"
-              title="Choose floorplan image"
-              onPress={() => this._handleChoosePhoto("photo")}
-            />
-          </Card>
-          <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <FormLabel>Floorplan Icon</FormLabel>
-            {this.state.icon && (
-              <Image
-                source={{ uri: this.state.icon.uri }}
-                style={styles.iconImage}
-              />)
-            }
-            <Button
-              buttonStyle={{ marginTop: 20, marginBottom: 20 }}
-              backgroundColor="#03A9F4"
-              title="Choose floorplan icon"
-              onPress={() => this._handleChoosePhoto("icon")}
-            />
-          </Card>
-          <Card>
-            <FormLabel>Building Location</FormLabel>
-            <View style={{}}>
+            <Card>
+              <FormLabel labelStyle={styles.formLabel}>Building Name</FormLabel>
               <FormInput
-                placeholder="Latitude..."
-                onChangeText={input => this.state.latitude = input}
+                placeholder="Name..."
+                onChangeText={input => this.state.name = input}
               />
-              <FormInput
-                placeholder="Longitude..."
-                onChangeText={input => this.state.longitude = input}
+            </Card>
+            <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+              <FormLabel labelStyle={styles.formLabel}>Floorplan Image</FormLabel>
+              {this.state.photo && (
+                <Image
+                  source={{ uri: this.state.photo.uri }}
+                  style={styles.photoImage}
+                />)
+              }
+              <Button
+                buttonStyle={{ marginTop: 20, marginBottom: 20 }}
+                backgroundColor="#03A9F4"
+                title="Choose floorplan image"
+                onPress={() => this._handleChoosePhoto("photo")}
               />
+            </Card>
+            <Card style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+              <FormLabel labelStyle={styles.formLabel}>Floorplan Icon</FormLabel>
+              {this.state.icon && (
+                <Image
+                  source={{ uri: this.state.icon.uri }}
+                  style={styles.iconImage}
+                />)
+              }
+              <Button
+                buttonStyle={{ marginTop: 20, marginBottom: 20 }}
+                backgroundColor="#03A9F4"
+                title="Choose floorplan icon"
+                onPress={() => this._handleChoosePhoto("icon")}
+              />
+            </Card>
+            <Card>
+              <FormLabel labelStyle={styles.formLabel}>Building Location</FormLabel>
+              <View style={{}}>
+                <FormInput
+                  placeholder="Latitude..."
+                  onChangeText={input => this.state.latitude = input}
+                />
+                <FormInput
+                  placeholder="Longitude..."
+                  onChangeText={input => this.state.longitude = input}
+                />
             </View>
           </Card>
           <Button
@@ -248,5 +248,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginLeft: 70,
     flex: 1
+  },
+  formLabel: {
+    color: '#696969',
   }
 });
