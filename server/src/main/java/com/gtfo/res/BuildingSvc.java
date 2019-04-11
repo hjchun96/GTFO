@@ -28,7 +28,7 @@ import java.util.stream.StreamSupport;
 
 public class BuildingSvc {
 
-    static final String FLASK_SERVER_IP = "http://18.205.22.50";
+    static final String FLASK_SERVER_IP = "http://3.89.97.86";
 
     public MongoConnection mongoConnection;
     public MongoDatabase mongoDatabase;
