@@ -253,14 +253,14 @@ export default class BuildingScreen extends React.Component {
       paddingBottom: 30,
     },
     contentContainer: {
-      paddingTop: 30,
+      // paddingTop: 30, // TO DANIEL: THIS WASN'T COMMENTED BEFORE
       alignItems: 'center',
     },
     floorPlan: {
       width: 375,
       height: 375,
       resizeMode: 'contain',
-      marginTop: -30,
+      marginTop: -60, // TO DANIEL: USED TO BE -30
       marginLeft: 0,
       paddingBottom: 30,
     },
