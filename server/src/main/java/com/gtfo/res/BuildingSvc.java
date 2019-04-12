@@ -180,6 +180,8 @@ public class BuildingSvc {
             ImageIO.write(floorplan, "png", os);
             JSONObject res = new JSONObject();
             res.append("img", Base64.encodeBase64String(os.toByteArray()));
+            res.append("h", floorplan.getHeight());
+            res.append("w", floorplan.getWidth());
             return res.toString();
         } catch(IllegalArgumentException|AmazonServiceException e) {
             JSONObject res = new JSONObject();

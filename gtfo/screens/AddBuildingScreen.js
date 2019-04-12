@@ -200,6 +200,8 @@ export default class AddBuildingScreen extends React.Component {
             this.props.navigation.navigate("Building", {
               building_name: this.state.name,
               img: image_string,
+              h: json.h,
+              w: json.w,
             });
           }
         }

@@ -38,10 +38,11 @@ export default class BuildingScreen extends React.Component {
   }
 
   componentDidMount = () => {
-    let image_string = this.props.navigation.getParam('img', '')
     this.setState({
-      rendered_image: {uri: image_string },
+      rendered_image: {uri: this.props.navigation.getParam('img', '') },
       loading: false,
+      h: this.props.navigation.getParam('h', ''),
+      w: this.props.navigation.getParam('w', ''),
     });
   }
 
@@ -143,12 +144,19 @@ export default class BuildingScreen extends React.Component {
   }
 
   _handleSetEnd = async () => {
-    const {width, height} = Image.resolveAssetSource(picture);
+    const width = this.state.w;
+    const height = this.state.h;
+
+    console.log("Image's width: " + width)
+    console.log("Image's height: " + height)
+
+    var aspect = width / height
+    var offset = 138 * (aspect - 1)
 
     srcX = this.state.startXCoord * width / 375.0;
-    srcY = (this.state.startYCoord - 43) * height / 288;
+    srcY = (this.state.startYCoord - offset) * height / (375 - 2 * offset);
     tgtX = this.state.endXCoord * width / 375.0;
-    tgtY = (this.state.endYCoord - 43) * height / 288;
+    tgtY = (this.state.endYCoord - offset) * height / (375 - 2 * offset);
 
     src = srcX.toString() + "," + srcY.toString();
     dest = tgtX.toString() + "," + tgtY.toString();
@@ -165,11 +173,11 @@ export default class BuildingScreen extends React.Component {
         this._handleStartOver();
         return null;
       } else {
-        var image_string = 'data:image/png;base64,'+json.img[0];
+        var img_string = 'data:image/png;base64,'+json.img[0];
         this.setState({
           routeStatus : "DIRECTIONS",
           viewDirections: true,
-          rendered_image: {uri : image_string}
+          rendered_image: {uri : img_string}
         });
         return getNNImage(this.state.building_name);
       }}).then(res => {
@@ -184,9 +192,9 @@ export default class BuildingScreen extends React.Component {
             console.log("error fetching NN image");
             return;
           } else {
-            var image_string = 'data:image/png;base64,'+json.img[0];
+            var img_string = 'data:image/png;base64,'+json.img[0];
             this.setState({
-              nn_image: {uri : image_string}
+              nn_image: {uri : img_string}
             });
           }
         }
@@ -194,7 +202,6 @@ export default class BuildingScreen extends React.Component {
     }
 
     _handleStartOver = async () => {
-      let image_string = this.props.navigation.getParam('img', '')
       this.setState({
         switch1Value: false,
         startXCoord: -1,
@@ -202,13 +209,14 @@ export default class BuildingScreen extends React.Component {
         endXCoord: -1,
         endYCoord: -1,
         routeStatus: "START",
-        rendered_image: {uri: image_string},
+        rendered_image: {uri: this.props.navigation.getParam('img', '') },
       }, () => {
         this.setState({routeStatus: "START"});
       });
     }
 
     _handlePress = async (evt) => {
+      console.log("x: " + evt.nativeEvent.locationX + ", y: " + evt.nativeEvent.locationY)
       if (this.state.routeStatus == "START") {
         this.setState({ startXCoord: evt.nativeEvent.locationX,
           startYCoord: evt.nativeEvent.locationY,
@@ -250,28 +258,21 @@ export default class BuildingScreen extends React.Component {
       flex: 1,
       backgroundColor: '#fff',
       alignItems: 'center',
-      paddingBottom: 30,
     },
     contentContainer: {
       // paddingTop: 30, // TO DANIEL: THIS WASN'T COMMENTED BEFORE
       alignItems: 'center',
     },
     floorPlan: {
-      width: 375,
       height: 375,
+      width: 375,
       resizeMode: 'contain',
-      marginTop: -60, // TO DANIEL: USED TO BE -30
       marginLeft: 0,
-      paddingBottom: 30,
+      marginTop: 0
     },
     directions: {
       fontSize: 30,
       color: "red",
-    },
-    overlayContainer: {
-      left: 50,
-      top: 10,
-      alignItems: 'flex-start',
     },
     overlay: {
       opacity: 0.5,

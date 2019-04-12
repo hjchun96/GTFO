@@ -76,8 +76,8 @@ export default class HomeScreen extends React.Component {
             closestBuildings.map((building, i) => (
               <ListItem
                 key={i}
-                leftIcon={building.hasIcon ? 
-                    <Image style={{width: 30, height: 30, resizeMode: 'contain', marginRight: 5}} 
+                leftIcon={building.hasIcon ?
+                    <Image style={{width: 30, height: 30, resizeMode: 'contain', marginRight: 5}}
                         source={{uri: building.icon}} >
                     </Image>
                   : {
@@ -146,7 +146,7 @@ export default class HomeScreen extends React.Component {
       // Call endpoint
       var image = await getImage(building_name);
       var image_string = 'data:image/png;base64,'+image.img[0];
-      this.setState({[building_name]: image_string})
+      this.setState({[building_name]: {img: image_string, h: image.h, w: image.w}});
     }
     return Promise.resolve(1);
   }
@@ -154,7 +154,9 @@ export default class HomeScreen extends React.Component {
   _handleBuildingPressed = (building_name) => {
     this.props.navigation.navigate("Building", {
       building_name: building_name,
-      img: this.state[building_name],
+      img: this.state[building_name].img,
+      h: this.state[building_name].h,
+      w: this.state[building_name].w,
     });
   }
 
