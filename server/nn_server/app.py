@@ -5,6 +5,7 @@ from main import feed_image_to_net
 from flask_cors import CORS, cross_origin
 from PIL import Image
 from base64 import b64encode
+from base64 import b64decode
 app = Flask(__name__)
 CORS(app)
 
@@ -62,25 +63,6 @@ def detect_walls():
 
 	display_img(binarized_output)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     image_result = feed_image_to_net(image)
     result = image_result
     #result = Image.fromarray(((1 - image_result) * 255).astype(np.uint8))
@@ -95,6 +77,11 @@ def get_output():
     encoding = b64encode(s)
     print(encoding)
     return encoding
+
+@app.route('/squarize', methods=["GET"])
+def squarize():
+    base64_image = request.args.get('image')
+    img = b64decode()
 
 @app.route('/')
 def hello():
