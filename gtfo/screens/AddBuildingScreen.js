@@ -194,7 +194,7 @@ export default class AddBuildingScreen extends React.Component {
           this.setState({spinner: false});
           if (json.err) {
             console.log("Error fetching image");
-            Alert.alert("Could not find floorplan image");
+            alert("Could not find floorplan image");
           } else {
             var image_string = 'data:image/png;base64,'+json.img[0];
             this.props.navigation.navigate("Building", {
