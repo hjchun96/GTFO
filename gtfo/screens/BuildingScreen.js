@@ -150,8 +150,8 @@ export default class BuildingScreen extends React.Component {
     console.log("Image's width: " + width)
     console.log("Image's height: " + height)
 
-    var aspect = width / height
-    var offset = 138 * (aspect - 1)
+    var aspect = height / width
+    var offset = 375 * (1 - aspect) / 2
 
     srcX = this.state.startXCoord * width / 375.0;
     srcY = (this.state.startYCoord - offset) * height / (375 - 2 * offset);
